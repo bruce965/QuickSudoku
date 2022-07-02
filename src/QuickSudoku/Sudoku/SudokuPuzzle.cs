@@ -12,6 +12,7 @@ public class SudokuPuzzle : IPuzzle, IRegion, IEquatable<SudokuPuzzle>, IEnumera
     public PuzzleRows Rows => new(this);
     public PuzzleColumns Columns => new(this);
     public PuzzleSquares Squares => new(this);
+    public PuzzleRegions Regions => new(this);
     public PuzzleCells Cells => new(this);
 
     public SudokuCell this[SudokuCellIndex index] => new(this, index);
@@ -237,7 +238,7 @@ public class SudokuPuzzle : IPuzzle, IRegion, IEquatable<SudokuPuzzle>, IEnumera
 
         int IReadOnlyCollection<SudokuColumn>.Count => 9;
 
-        public SudokuColumn this[int y] => new(_puzzle, y);
+        public SudokuColumn this[int x] => new(_puzzle, x);
 
         internal PuzzleColumns(SudokuPuzzle puzzle)
         {
@@ -314,7 +315,75 @@ public class SudokuPuzzle : IPuzzle, IRegion, IEquatable<SudokuPuzzle>, IEnumera
 
     #endregion
 
-    #region Cells
+    #region PuzzleRegions
+
+    public struct PuzzleRegions : IReadOnlyList<SudokuRegion>
+    {
+        public struct Enumerator : IEnumerator<SudokuRegion>
+        {
+            readonly SudokuPuzzle _puzzle;
+            int _index;
+
+            public SudokuRegion Current
+            {
+                get
+                {
+                    Debug.Assert(_index >= 0 && _index < 27);
+
+                    if (_index < 9)
+                        return _puzzle.Rows[_index];
+
+                    if (_index < 18)
+                        return _puzzle.Columns[_index - 9];
+
+                    return _puzzle.Squares[_index - 18];
+                }
+            }
+
+            object IEnumerator.Current => Current;
+
+            internal Enumerator(SudokuPuzzle puzzle)
+            {
+                _puzzle = puzzle;
+                _index = -1;
+            }
+
+            public bool MoveNext()
+            {
+                _index++;
+                return _index < 9;
+            }
+
+            public void Reset()
+            {
+                _index = -1;
+            }
+
+            public void Dispose() { }
+        }
+
+
+        readonly SudokuPuzzle _puzzle;
+
+        int IReadOnlyCollection<SudokuRegion>.Count => 27;
+
+        public SudokuRegion this[int index] => new(_puzzle, index);
+
+        internal PuzzleRegions(SudokuPuzzle puzzle)
+        {
+            _puzzle = puzzle;
+        }
+
+        public Enumerator GetEnumerator() => new(_puzzle);
+
+        IEnumerator<SudokuRegion> IEnumerable<SudokuRegion>.GetEnumerator() => GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    #endregion
+
+    #region PuzzleCells
 
     public struct PuzzleCells : IReadOnlyList<SudokuCell>
     {

@@ -59,11 +59,11 @@ public class SudokuSolverTests
 
         var allocBefore = GC.GetTotalAllocatedBytes(true);
 
-        var nakedSingleFound = SudokuSolver.SolveHiddenSingle(puzzle);
+        var nakedSinglesFound = SudokuSolver.SolveHiddenSingles(puzzle);
 
         var allocAfter = GC.GetTotalAllocatedBytes(true);
 
-        Assert.True(nakedSingleFound);
+        Assert.Equal(1, nakedSinglesFound);
 
         Assert.Equal(1, puzzle[0, 0].Value);
 
@@ -99,11 +99,11 @@ public class SudokuSolverTests
 
         var allocBefore = GC.GetTotalAllocatedBytes(true);
 
-        var nakedPairFound = SudokuSolver.SolveNakedPair(puzzle);
+        var nakedPairsFound = SudokuSolver.SolveNakedPairs(puzzle);
 
         var allocAfter = GC.GetTotalAllocatedBytes(true);
 
-        Assert.True(nakedPairFound);
+        Assert.Equal(1, nakedPairsFound);
 
         Assert.False(puzzle[1, 0].CandidateValues.Contains(8));
         Assert.False(puzzle[1, 0].CandidateValues.Contains(9));

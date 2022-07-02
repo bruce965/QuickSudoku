@@ -146,6 +146,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
     public SudokuRow Row => new(Puzzle, Index.Y);
     public SudokuColumn Column => new(Puzzle, Index.X);
     public SudokuSquare Square => new(Puzzle, Index.Square);
+    public CellRegions Regions => new(this);
 
     /// <summary>
     /// Get or set digits allowed on this cell.
@@ -186,8 +187,6 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
     internal SudokuCell(SudokuPuzzle puzzle, SudokuCellIndex index)
     {
-        Debug.Assert(puzzle != null);
-
         Puzzle = puzzle;
         Index = index;
     }
@@ -234,6 +233,78 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
     public static bool operator !=(SudokuCell left, SudokuCell right)
         => !(left == right);
+
+    #endregion
+
+    #region CellRegions
+
+    public struct CellRegions : IReadOnlyList<SudokuRegion>
+    {
+        public struct Enumerator : IEnumerator<SudokuRegion>
+        {
+            readonly SudokuCell _cell;
+            int _index;
+
+            public SudokuRegion Current
+            {
+                get
+                {
+                    return _index switch
+                    {
+                        0 => _cell.Row,
+                        1 => _cell.Column,
+                        2 => _cell.Square,
+                        _ => throw new InvalidOperationException()
+                    };
+                }
+            }
+
+            object IEnumerator.Current => Current;
+
+            internal Enumerator(SudokuCell cell)
+            {
+                _cell = cell;
+                _index = -1;
+            }
+
+            public bool MoveNext()
+            {
+                _index++;
+                return _index < 3;
+            }
+
+            public void Reset()
+            {
+                _index = -1;
+            }
+
+            public void Dispose() { }
+        }
+
+
+        readonly SudokuCell _cell;
+
+        int IReadOnlyCollection<SudokuRegion>.Count => 3;
+
+        public SudokuRegion this[int index] => index switch
+        {
+            0 => _cell.Row,
+            1 => _cell.Column,
+            2 => _cell.Square,
+            _ => throw new ArgumentOutOfRangeException(nameof(index))
+        };
+
+        internal CellRegions(SudokuCell cell)
+        {
+            _cell = cell;
+        }
+
+        public Enumerator GetEnumerator() => new(_cell);
+
+        IEnumerator<SudokuRegion> IEnumerable<SudokuRegion>.GetEnumerator() => GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
 
     #endregion
 }

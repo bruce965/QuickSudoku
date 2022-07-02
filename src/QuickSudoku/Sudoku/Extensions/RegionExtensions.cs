@@ -2,12 +2,10 @@
 
 public static class RegionExtensions
 {
-    #region SudokuRow
-
     /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.IsSolved"/>
-    public static bool IsSolved(this SudokuRow row)
+    public static bool IsSolved(this SudokuRegion region)
     {
-        foreach (var cell in row.Cells)
+        foreach (var cell in region.Cells)
             if (!cell.IsSolved())
                 return false;
 
@@ -15,9 +13,9 @@ public static class RegionExtensions
     }
 
     /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.HasSolution"/>
-    public static bool HasSolution(this SudokuRow row)
+    public static bool HasSolution(this SudokuRegion region)
     {
-        foreach (var cell in row.Cells)
+        foreach (var cell in region.Cells)
             if (!cell.HasSolution())
                 return false;
 
@@ -25,9 +23,9 @@ public static class RegionExtensions
     }
 
     /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.MayContain"/>
-    public static bool MayContain(this SudokuRow row, int value)
+    public static bool MayContain(this SudokuRegion region, int value)
     {
-        foreach (var cell in row.Cells)
+        foreach (var cell in region.Cells)
             if (cell.MayContain(value))
                 return true;
 
@@ -35,102 +33,72 @@ public static class RegionExtensions
     }
 
     /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.Contains"/>
-    public static bool Contains(this SudokuRow row, int value)
+    public static bool Contains(this SudokuRegion region, int value)
     {
-        foreach (var cell in row.Cells)
+        foreach (var cell in region.Cells)
             if (cell.Contains(value))
                 return true;
 
         return false;
     }
+
+    #region SudokuRow
+
+    /// <inheritdoc cref="IsSolved"/>
+    public static bool IsSolved(this SudokuRow region)
+        => ((SudokuRegion)region).IsSolved();
+
+    /// <inheritdoc cref="HasSolution"/>
+    public static bool HasSolution(this SudokuRow region)
+        => ((SudokuRegion)region).HasSolution();
+
+    /// <inheritdoc cref="MayContain"/>
+    public static bool MayContain(this SudokuRow region, int value)
+        => ((SudokuRegion)region).MayContain(value);
+
+    /// <inheritdoc cref="Contains"/>
+    public static bool Contains(this SudokuRow region, int value)
+        => ((SudokuRegion)region).Contains(value);
 
     #endregion
 
     #region SudokuColumn
 
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.IsSolved"/>
-    public static bool IsSolved(this SudokuColumn column)
-    {
-        foreach (var cell in column.Cells)
-            if (!cell.IsSolved())
-                return false;
+    /// <inheritdoc cref="IsSolved"/>
+    public static bool IsSolved(this SudokuColumn region)
+        => ((SudokuRegion)region).IsSolved();
 
-        return true;
-    }
+    /// <inheritdoc cref="HasSolution"/>
+    public static bool HasSolution(this SudokuColumn region)
+        => ((SudokuRegion)region).HasSolution();
 
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.HasSolution"/>
-    public static bool HasSolution(this SudokuColumn column)
-    {
-        foreach (var cell in column.Cells)
-            if (!cell.HasSolution())
-                return false;
+    /// <inheritdoc cref="MayContain"/>
+    public static bool MayContain(this SudokuColumn region, int value)
+        => ((SudokuRegion)region).MayContain(value);
 
-        return true;
-    }
-
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.MayContain"/>
-    public static bool MayContain(this SudokuColumn column, int value)
-    {
-        foreach (var cell in column.Cells)
-            if (cell.MayContain(value))
-                return true;
-
-        return false;
-    }
-
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.Contains"/>
-    public static bool Contains(this SudokuColumn column, int value)
-    {
-        foreach (var cell in column.Cells)
-            if (cell.Contains(value))
-                return true;
-
-        return false;
-    }
+    /// <inheritdoc cref="Contains"/>
+    public static bool Contains(this SudokuColumn region, int value)
+        => ((SudokuRegion)region).Contains(value);
 
     #endregion
 
     #region SudokuSquare
 
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.IsSolved"/>
-    public static bool IsSolved(this SudokuSquare square)
-    {
-        foreach (var cell in square.Cells)
-            if (!cell.IsSolved())
-                return false;
+    /// <inheritdoc cref="IsSolved"/>
+    public static bool IsSolved(this SudokuSquare region)
+        => ((SudokuRegion)region).IsSolved();
 
-        return true;
-    }
+    /// <inheritdoc cref="HasSolution"/>
+    public static bool HasSolution(this SudokuSquare region)
+        => ((SudokuRegion)region).HasSolution();
 
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.HasSolution"/>
-    public static bool HasSolution(this SudokuSquare square)
-    {
-        foreach (var cell in square.Cells)
-            if (!cell.HasSolution())
-                return false;
+    /// <inheritdoc cref="MayContain"/>
+    public static bool MayContain(this SudokuSquare region, int value)
+        => ((SudokuRegion)region).MayContain(value);
 
-        return true;
-    }
-
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.MayContain"/>
-    public static bool MayContain(this SudokuSquare square, int value)
-    {
-        foreach (var cell in square.Cells)
-            if (cell.MayContain(value))
-                return true;
-
-        return false;
-    }
-
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.Contains"/>
-    public static bool Contains(this SudokuSquare square, int value)
-    {
-        foreach (var cell in square.Cells)
-            if (cell.Contains(value))
-                return true;
-
-        return false;
-    }
+    /// <inheritdoc cref="Contains"/>
+    public static bool Contains(this SudokuSquare region, int value)
+        => ((SudokuRegion)region).Contains(value);
 
     #endregion
 }
