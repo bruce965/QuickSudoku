@@ -299,7 +299,7 @@ public class SudokuPuzzle : IPuzzle, IRegion, IEquatable<SudokuPuzzle>, IEnumera
 
         int IReadOnlyCollection<SudokuSquare>.Count => 9;
 
-        public SudokuSquare this[int y] => new(_puzzle, y);
+        public SudokuSquare this[int index] => new(_puzzle, index);
 
         internal PuzzleSquares(SudokuPuzzle puzzle)
         {
@@ -351,7 +351,7 @@ public class SudokuPuzzle : IPuzzle, IRegion, IEquatable<SudokuPuzzle>, IEnumera
             public bool MoveNext()
             {
                 _index++;
-                return _index < 9;
+                return _index < 27;
             }
 
             public void Reset()

@@ -9,9 +9,12 @@ public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumer
 {
     public SudokuPuzzle Puzzle { get; }
 
+    // 0-8 = row, 9-17 = column, 18-26 = square
     readonly int _index;
 
     public RegionCells Cells => new(this);
+
+    public RegionIntersections IntersectingRegions => new(this);
 
     public SudokuCell this[int index]
     {
@@ -132,6 +135,87 @@ public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumer
         public Enumerator GetEnumerator() => new(_region);
 
         IEnumerator<SudokuCell> IEnumerable<SudokuCell>.GetEnumerator() => GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    #endregion
+
+    #region RegionIntersections
+
+    int _intersectionsCount => _index < 18 ? 12 : 6;  // row/col = 12, square = 6
+
+    public struct RegionIntersections : IReadOnlyList<SudokuRegionsIntersection>
+    {
+        public struct Enumerator : IEnumerator<SudokuRegionsIntersection>
+        {
+            readonly SudokuRegion _region;
+            int _index;
+
+            public SudokuRegionsIntersection Current
+            {
+                get
+                {
+                    Debug.Assert(_index >= 0 && _index < _region._intersectionsCount);
+
+                    return new RegionIntersections(_region)[_index];
+                }
+            }
+
+            object IEnumerator.Current => Current;
+
+            public Enumerator(SudokuRegion region)
+            {
+                _region = region;
+                _index = -1;
+            }
+
+            public bool MoveNext()
+            {
+                _index++;
+                return _index < _region._intersectionsCount;
+            }
+
+            public void Reset()
+            {
+                _index = -1;
+            }
+
+            public void Dispose() { }
+        }
+
+        readonly SudokuRegion _region;
+
+        int IReadOnlyCollection<SudokuRegionsIntersection>.Count => _region._intersectionsCount;
+
+        public SudokuRegionsIntersection this[int index]
+        {
+            get => (_region._index, index) switch
+            {
+                // row with 9 columns and 3 squares
+                (int r, int i) when r < 9 && i < 9 => new(_region, _region.Puzzle.Columns[i]),
+                (int r, int i) when r < 9 && i < 18 => new(_region, _region.Puzzle.Squares[(r / 3) * 3 + i - 9]),
+
+                // column with 9 rows and 3 squares
+                (int r, int i) when r < 18 && i < 9 => new(_region, _region.Puzzle.Rows[i]),
+                (int r, int i) when r < 18 && i < 18 => new(_region, _region.Puzzle.Squares[(i - 9) * 3 + (r - 9) / 3]),
+
+                // square with 3 rows and 3 columns
+                (int r, int i) when r < 27 && i < 3 => new(_region, _region.Puzzle.Rows[((r - 18) / 3) * 3 + i]),
+                (int r, int i) when r < 27 && i < 6 => new(_region, _region.Puzzle.Columns[((r - 18) % 3) * 3 + i - 3]),
+
+                (_, _) => throw new IndexOutOfRangeException()
+            };
+        }
+
+        internal RegionIntersections(SudokuRegion region)
+        {
+            _region = region;
+        }
+
+        public Enumerator GetEnumerator() => new(_region);
+
+        IEnumerator<SudokuRegionsIntersection> IEnumerable<SudokuRegionsIntersection>.GetEnumerator() => GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

@@ -13,12 +13,12 @@ public interface ICell : IEquatable<ICell>
     /// <summary>
     /// Regions this cell is part of.
     /// </summary>
-    IEnumerable<IRegion> Regions { get; }
+    IEnumerable<IRegion> Regions => Puzzle.Regions.Where(r => r.Cells.Contains(this));
 
     /// <summary>
     /// Values legal on this cell.
     /// </summary>
-    IEnumerable<object> LegalValues { get; }
+    IEnumerable<object> LegalValues => Puzzle.LegalValues;
 
     /// <summary>
     /// Candidate values in this cell.

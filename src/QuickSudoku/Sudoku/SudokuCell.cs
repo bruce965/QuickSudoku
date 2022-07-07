@@ -94,8 +94,10 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
             public bool MoveNext()
             {
-                if (_value < 1)
-                    _value = 1;
+                if (_value < 0)
+                    _value = 0;
+
+                _value++;
 
                 for (; _value <= 9; _value++)
                     if (((int)_digits & (1 << (_value - 1))) != 0)

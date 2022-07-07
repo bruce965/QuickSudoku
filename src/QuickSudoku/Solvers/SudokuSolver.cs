@@ -18,30 +18,23 @@ public static class SudokuSolver
         foreach (var cell in puzzle.Cells)
         {
             if (maxCount != -1 && nakedSinglesFound >= maxCount)
-                break;
+                return nakedSinglesFound;
 
             // if cell value is already known, skip cell
             if (cell.Value != null)
-                break;
+                continue;
 
-            for (var value = 1; value <= 9; value++)
+            foreach (var value in cell.CandidateValues)
             {
-                // if this value cannot be in this cell (because previously excluded), skip
-                if (!cell.CandidateValues.Contains(value))
-                    continue;
-
                 // exclude all values in the same region
                 foreach (var region in cell.Regions)
                     if (region.Contains(value))
                         cell.CandidateValues.Remove(value);
-
-                // if only one possible value remains, a naked single has been found
-                if (cell.Value != null)
-                {
-                    nakedSinglesFound++;
-                    break;
-                }
             }
+
+            // if only one possible value remains, a naked single has been found
+            if (cell.Value != null)
+                nakedSinglesFound++;
         }
 
         return nakedSinglesFound;
@@ -64,7 +57,7 @@ public static class SudokuSolver
             for (var candidate = 1; candidate <= 9; candidate++)
             {
                 if (maxCount != -1 && hiddenSinglesFound >= maxCount)
-                    break;
+                    return hiddenSinglesFound;
 
                 SudokuCell? allowedIn = null;
                 var skipCandidate = false;
@@ -87,7 +80,7 @@ public static class SudokuSolver
                 if (skipCandidate)
                     continue;
 
-                if (allowedIn != null)
+                if (allowedIn != null && !allowedIn.Value.IsSolved())
                 {
                     // if there is only once cell where this candidate is possible, a hidden single has been found
                     var cell = allowedIn.Value;
@@ -101,6 +94,78 @@ public static class SudokuSolver
         return hiddenSinglesFound;
     }
 
+    static int SolveNakedGroups(SudokuPuzzle puzzle, int groupSize, int maxCount = -1)
+    {
+        int nakedGroupsFound = 0;
+
+        if (maxCount == 0)
+            return 0;
+
+        foreach (var region in puzzle.Regions)
+        {
+            foreach (var intersection in region.IntersectingRegions)
+            {
+                for (var candidate = 1; candidate <= 9; candidate++)
+                {
+                    if (intersection.First.Cells.Except(intersection.Second.Cells).All(c => !c.MayContain(candidate)))
+                    {
+                        if (intersection.First.Cells.Intersect(intersection.Second.Cells).Where(c => c.MayContain(candidate)).Count() != groupSize)
+                        {
+                            // solve only for exact group size (naked pair, naked triple, etc...)
+                            continue;
+                        }
+
+                        // EXAMPLE:
+                        // * `intersection.First` is top left corner
+                        // * `intersection.Second` is leftmost column
+                        //
+                        // ,---,
+                        // |123|... ...
+                        // |.45|... ...
+                        // |.67|... ...
+                        // |-|-'
+                        // |.|. ... ...
+                        // |.|. ... ...
+                        // |.|. ... ...
+                        // | |
+                        // |.|. ... ...
+                        // |.|. ... ...
+                        // |.|. ... ...
+                        // '-'
+                        //
+                        // Since in the square digits 8 and 9 can only be in
+                        // a cell shared with the column, 8 and 9 can be removed
+                        // from all cells in the column that are not shared with
+                        // the square.
+
+                        bool nakedPairFound = false;
+
+                        foreach (var cell in intersection.Second.Cells.Except(intersection.First.Cells))
+                        {
+                            // TODO: exclude naked triples, quads, etc...
+
+                            if (cell.MayContain(candidate))
+                            {
+                                cell.CandidateValues.Remove(candidate);
+                                nakedPairFound = true;
+                            }
+                        }
+
+                        if (nakedPairFound)
+                        {
+                            nakedGroupsFound++;
+
+                            if (maxCount != -1 && nakedGroupsFound >= maxCount)
+                                return nakedGroupsFound;
+                        }
+                    }
+                }
+            }
+        }
+
+        return nakedGroupsFound;
+    }
+
     /// <summary>
     /// Solve naked pairs in a puzzle.
     ///
@@ -110,10 +175,7 @@ public static class SudokuSolver
     /// <param name="maxCount">How many naked pairs to be solved before stopping.</param>
     /// <returns>Number of naked pairs solved.</returns>
     public static int SolveNakedPairs(SudokuPuzzle puzzle, int maxCount = -1)
-    {
-        // TODO
-        return 0;
-    }
+        => SolveNakedGroups(puzzle, 2, maxCount);
 
     /// <summary>
     /// Solve hidden pairs in a puzzle.
@@ -138,10 +200,7 @@ public static class SudokuSolver
     /// <param name="maxCount">How many naked triples to be solved before stopping.</param>
     /// <returns>Number of naked triples solved.</returns>
     public static int SolveNakedTriples(SudokuPuzzle puzzle, int maxCount = -1)
-    {
-        // TODO
-        return 0;
-    }
+        => SolveNakedGroups(puzzle, 3, maxCount);
 
     /// <summary>
     /// Solve hidden triples in a puzzle.
@@ -166,10 +225,7 @@ public static class SudokuSolver
     /// <param name="maxCount">How many naked quads to be solved before stopping.</param>
     /// <returns>Number of naked quads solved.</returns>
     public static int SolveNakedQuads(SudokuPuzzle puzzle, int maxCount = -1)
-    {
-        // TODO
-        return 0;
-    }
+        => SolveNakedGroups(puzzle, 4, maxCount);
 
     /// <summary>
     /// Solve hidden quads in a puzzle.

@@ -22,16 +22,6 @@ public static class RegionExtensions
         return true;
     }
 
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.MayContain"/>
-    public static bool MayContain(this SudokuRegion region, int value)
-    {
-        foreach (var cell in region.Cells)
-            if (cell.MayContain(value))
-                return true;
-
-        return false;
-    }
-
     /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.Contains"/>
     public static bool Contains(this SudokuRegion region, int value)
     {
@@ -52,10 +42,6 @@ public static class RegionExtensions
     public static bool HasSolution(this SudokuRow region)
         => ((SudokuRegion)region).HasSolution();
 
-    /// <inheritdoc cref="MayContain"/>
-    public static bool MayContain(this SudokuRow region, int value)
-        => ((SudokuRegion)region).MayContain(value);
-
     /// <inheritdoc cref="Contains"/>
     public static bool Contains(this SudokuRow region, int value)
         => ((SudokuRegion)region).Contains(value);
@@ -72,10 +58,6 @@ public static class RegionExtensions
     public static bool HasSolution(this SudokuColumn region)
         => ((SudokuRegion)region).HasSolution();
 
-    /// <inheritdoc cref="MayContain"/>
-    public static bool MayContain(this SudokuColumn region, int value)
-        => ((SudokuRegion)region).MayContain(value);
-
     /// <inheritdoc cref="Contains"/>
     public static bool Contains(this SudokuColumn region, int value)
         => ((SudokuRegion)region).Contains(value);
@@ -91,10 +73,6 @@ public static class RegionExtensions
     /// <inheritdoc cref="HasSolution"/>
     public static bool HasSolution(this SudokuSquare region)
         => ((SudokuRegion)region).HasSolution();
-
-    /// <inheritdoc cref="MayContain"/>
-    public static bool MayContain(this SudokuSquare region, int value)
-        => ((SudokuRegion)region).MayContain(value);
 
     /// <inheritdoc cref="Contains"/>
     public static bool Contains(this SudokuSquare region, int value)
