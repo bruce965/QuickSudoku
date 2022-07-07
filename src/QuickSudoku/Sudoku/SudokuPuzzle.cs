@@ -5,14 +5,14 @@ using System.Diagnostics;
 namespace QuickSudoku.Sudoku;
 
 [DebuggerDisplay($"{{{nameof(DebuggerDisplay)},nq}}")]
-public class SudokuPuzzle : IPuzzle, IRegion, IEquatable<SudokuPuzzle>, IEnumerable<IRegion>, IEnumerable<ICell>
+public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerable<IHouse>, IEnumerable<ICell>
 {
     internal readonly SudokuDigits[] _data;
 
     public PuzzleRows Rows => new(this);
     public PuzzleColumns Columns => new(this);
     public PuzzleSquares Squares => new(this);
-    public PuzzleRegions Regions => new(this);
+    public PuzzleHouses Houses => new(this);
     public PuzzleCells Cells => new(this);
 
     public SudokuCell this[SudokuCellIndex index] => new(this, index);
@@ -86,28 +86,28 @@ public class SudokuPuzzle : IPuzzle, IRegion, IEquatable<SudokuPuzzle>, IEnumera
         SudokuDigits.Digit9,
     };
 
-    IEnumerable<IRegion> IPuzzle.Regions => this;
+    IEnumerable<IHouse> IPuzzle.Houses => this;
 
     object ICloneable.Clone() => Clone();
 
     #endregion
 
-    #region IRegion
+    #region IHouse
 
-    IPuzzle IRegion.Puzzle => this;
+    IPuzzle IHouse.Puzzle => this;
 
-    IEnumerable<object> IRegion.LegalValues => LegalValues;
+    IEnumerable<object> IHouse.LegalValues => LegalValues;
 
-    IEnumerable<ICell> IRegion.Cells => this;
+    IEnumerable<ICell> IHouse.Cells => this;
 
-    public bool Equals(IRegion? other)
+    public bool Equals(IHouse? other)
         => other is SudokuPuzzle s && Equals(s);
 
     #endregion
 
-    #region IEnumerable<IRegion>
+    #region IEnumerable<IHouse>
 
-    IEnumerator<IRegion> IEnumerable<IRegion>.GetEnumerator()
+    IEnumerator<IHouse> IEnumerable<IHouse>.GetEnumerator()
     {
         for (var y = 0; y < 9; y++)
             yield return new SudokuRow(this, y);
@@ -315,16 +315,16 @@ public class SudokuPuzzle : IPuzzle, IRegion, IEquatable<SudokuPuzzle>, IEnumera
 
     #endregion
 
-    #region PuzzleRegions
+    #region PuzzleHouses
 
-    public struct PuzzleRegions : IReadOnlyList<SudokuRegion>
+    public struct PuzzleHouses : IReadOnlyList<SudokuHouse>
     {
-        public struct Enumerator : IEnumerator<SudokuRegion>
+        public struct Enumerator : IEnumerator<SudokuHouse>
         {
             readonly SudokuPuzzle _puzzle;
             int _index;
 
-            public SudokuRegion Current
+            public SudokuHouse Current
             {
                 get
                 {
@@ -365,18 +365,18 @@ public class SudokuPuzzle : IPuzzle, IRegion, IEquatable<SudokuPuzzle>, IEnumera
 
         readonly SudokuPuzzle _puzzle;
 
-        int IReadOnlyCollection<SudokuRegion>.Count => 27;
+        int IReadOnlyCollection<SudokuHouse>.Count => 27;
 
-        public SudokuRegion this[int index] => new(_puzzle, index);
+        public SudokuHouse this[int index] => new(_puzzle, index);
 
-        internal PuzzleRegions(SudokuPuzzle puzzle)
+        internal PuzzleHouses(SudokuPuzzle puzzle)
         {
             _puzzle = puzzle;
         }
 
         public Enumerator GetEnumerator() => new(_puzzle);
 
-        IEnumerator<SudokuRegion> IEnumerable<SudokuRegion>.GetEnumerator() => GetEnumerator();
+        IEnumerator<SudokuHouse> IEnumerable<SudokuHouse>.GetEnumerator() => GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

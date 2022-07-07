@@ -5,16 +5,16 @@ using System.Diagnostics;
 namespace QuickSudoku.Sudoku;
 
 [DebuggerDisplay($"{{{nameof(DebuggerDisplay)},nq}}")]
-public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumerable<ICell>
+public readonly struct SudokuHouse : IHouse, IEquatable<SudokuHouse>, IEnumerable<ICell>
 {
     public SudokuPuzzle Puzzle { get; }
 
     // 0-8 = row, 9-17 = column, 18-26 = square
     readonly int _index;
 
-    public RegionCells Cells => new(this);
+    public HouseCells Cells => new(this);
 
-    public RegionIntersections IntersectingRegions => new(this);
+    public HouseIntersections IntersectingHouses => new(this);
 
     public SudokuCell this[int index]
     {
@@ -44,7 +44,7 @@ public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumer
         }
     }
 
-    internal SudokuRegion(SudokuPuzzle puzzle, int index)
+    internal SudokuHouse(SudokuPuzzle puzzle, int index)
     {
         Debug.Assert(index >= 0 && index < 27);
 
@@ -52,15 +52,15 @@ public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumer
         _index = index;
     }
 
-    #region IRegion
+    #region IHouse
 
-    IPuzzle IRegion.Puzzle => Puzzle;
+    IPuzzle IHouse.Puzzle => Puzzle;
 
-    IEnumerable<object> IRegion.LegalValues => SudokuPuzzle.LegalValues;
+    IEnumerable<object> IHouse.LegalValues => SudokuPuzzle.LegalValues;
 
-    IEnumerable<ICell> IRegion.Cells => this;
+    IEnumerable<ICell> IHouse.Cells => this;
 
-    public bool Equals(IRegion? other)
+    public bool Equals(IHouse? other)
         => other is SudokuRow s && Equals(s);
 
     #endregion
@@ -80,13 +80,13 @@ public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumer
 
     #endregion
 
-    #region RegionCells
+    #region HouseCells
 
-    public struct RegionCells : IReadOnlyList<SudokuCell>
+    public struct HouseCells : IReadOnlyList<SudokuCell>
     {
         public struct Enumerator : IEnumerator<SudokuCell>
         {
-            readonly SudokuRegion _row;
+            readonly SudokuHouse _row;
             int _index;
 
             public SudokuCell Current
@@ -101,9 +101,9 @@ public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumer
 
             object IEnumerator.Current => Current;
 
-            public Enumerator(SudokuRegion region)
+            public Enumerator(SudokuHouse house)
             {
-                _row = region;
+                _row = house;
                 _index = -1;
             }
 
@@ -121,18 +121,18 @@ public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumer
             public void Dispose() { }
         }
 
-        readonly SudokuRegion _region;
+        readonly SudokuHouse _house;
 
         int IReadOnlyCollection<SudokuCell>.Count => 9;
 
-        public SudokuCell this[int index] => _region[index];
+        public SudokuCell this[int index] => _house[index];
 
-        internal RegionCells(SudokuRegion region)
+        internal HouseCells(SudokuHouse house)
         {
-            _region = region;
+            _house = house;
         }
 
-        public Enumerator GetEnumerator() => new(_region);
+        public Enumerator GetEnumerator() => new(_house);
 
         IEnumerator<SudokuCell> IEnumerable<SudokuCell>.GetEnumerator() => GetEnumerator();
 
@@ -141,39 +141,39 @@ public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumer
 
     #endregion
 
-    #region RegionIntersections
+    #region HouseIntersections
 
     int _intersectionsCount => _index < 18 ? 12 : 6;  // row/col = 12, square = 6
 
-    public struct RegionIntersections : IReadOnlyList<SudokuRegionsIntersection>
+    public struct HouseIntersections : IReadOnlyList<SudokuHousesIntersection>
     {
-        public struct Enumerator : IEnumerator<SudokuRegionsIntersection>
+        public struct Enumerator : IEnumerator<SudokuHousesIntersection>
         {
-            readonly SudokuRegion _region;
+            readonly SudokuHouse _house;
             int _index;
 
-            public SudokuRegionsIntersection Current
+            public SudokuHousesIntersection Current
             {
                 get
                 {
-                    Debug.Assert(_index >= 0 && _index < _region._intersectionsCount);
+                    Debug.Assert(_index >= 0 && _index < _house._intersectionsCount);
 
-                    return new RegionIntersections(_region)[_index];
+                    return new HouseIntersections(_house)[_index];
                 }
             }
 
             object IEnumerator.Current => Current;
 
-            public Enumerator(SudokuRegion region)
+            public Enumerator(SudokuHouse house)
             {
-                _region = region;
+                _house = house;
                 _index = -1;
             }
 
             public bool MoveNext()
             {
                 _index++;
-                return _index < _region._intersectionsCount;
+                return _index < _house._intersectionsCount;
             }
 
             public void Reset()
@@ -184,69 +184,69 @@ public readonly struct SudokuRegion : IRegion, IEquatable<SudokuRegion>, IEnumer
             public void Dispose() { }
         }
 
-        readonly SudokuRegion _region;
+        readonly SudokuHouse _house;
 
-        int IReadOnlyCollection<SudokuRegionsIntersection>.Count => _region._intersectionsCount;
+        int IReadOnlyCollection<SudokuHousesIntersection>.Count => _house._intersectionsCount;
 
-        public SudokuRegionsIntersection this[int index]
+        public SudokuHousesIntersection this[int index]
         {
-            get => (_region._index, index) switch
+            get => (_house._index, index) switch
             {
                 // row with 9 columns and 3 squares
-                (int r, int i) when r < 9 && i < 9 => new(_region, _region.Puzzle.Columns[i]),
-                (int r, int i) when r < 9 && i < 18 => new(_region, _region.Puzzle.Squares[(r / 3) * 3 + i - 9]),
+                (int r, int i) when r < 9 && i < 9 => new(_house, _house.Puzzle.Columns[i]),
+                (int r, int i) when r < 9 && i < 18 => new(_house, _house.Puzzle.Squares[(r / 3) * 3 + i - 9]),
 
                 // column with 9 rows and 3 squares
-                (int r, int i) when r < 18 && i < 9 => new(_region, _region.Puzzle.Rows[i]),
-                (int r, int i) when r < 18 && i < 18 => new(_region, _region.Puzzle.Squares[(i - 9) * 3 + (r - 9) / 3]),
+                (int r, int i) when r < 18 && i < 9 => new(_house, _house.Puzzle.Rows[i]),
+                (int r, int i) when r < 18 && i < 18 => new(_house, _house.Puzzle.Squares[(i - 9) * 3 + (r - 9) / 3]),
 
                 // square with 3 rows and 3 columns
-                (int r, int i) when r < 27 && i < 3 => new(_region, _region.Puzzle.Rows[((r - 18) / 3) * 3 + i]),
-                (int r, int i) when r < 27 && i < 6 => new(_region, _region.Puzzle.Columns[((r - 18) % 3) * 3 + i - 3]),
+                (int r, int i) when r < 27 && i < 3 => new(_house, _house.Puzzle.Rows[((r - 18) / 3) * 3 + i]),
+                (int r, int i) when r < 27 && i < 6 => new(_house, _house.Puzzle.Columns[((r - 18) % 3) * 3 + i - 3]),
 
                 (_, _) => throw new IndexOutOfRangeException()
             };
         }
 
-        internal RegionIntersections(SudokuRegion region)
+        internal HouseIntersections(SudokuHouse house)
         {
-            _region = region;
+            _house = house;
         }
 
-        public Enumerator GetEnumerator() => new(_region);
+        public Enumerator GetEnumerator() => new(_house);
 
-        IEnumerator<SudokuRegionsIntersection> IEnumerable<SudokuRegionsIntersection>.GetEnumerator() => GetEnumerator();
+        IEnumerator<SudokuHousesIntersection> IEnumerable<SudokuHousesIntersection>.GetEnumerator() => GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     #endregion
 
-    #region IEquatable<SudokuRegion>
+    #region IEquatable<SudokuHouse>
 
-    bool IEquatable<SudokuRegion>.Equals(SudokuRegion other) => this == other;
+    bool IEquatable<SudokuHouse>.Equals(SudokuHouse other) => this == other;
 
     public override bool Equals(object? obj)
-        => obj is SudokuRegion s && Equals(s);
+        => obj is SudokuHouse s && Equals(s);
 
     public override int GetHashCode()
         => _index;
 
-    public static bool operator ==(SudokuRegion left, SudokuRegion right)
+    public static bool operator ==(SudokuHouse left, SudokuHouse right)
         => left.Puzzle == right.Puzzle && left._index == right._index;
 
-    public static bool operator !=(SudokuRegion left, SudokuRegion right)
+    public static bool operator !=(SudokuHouse left, SudokuHouse right)
         => !(left == right);
 
     #endregion
 
-    public static implicit operator SudokuRegion(SudokuRow row)
+    public static implicit operator SudokuHouse(SudokuRow row)
         => new(row.Puzzle, row.Y);
 
-    public static implicit operator SudokuRegion(SudokuColumn column)
+    public static implicit operator SudokuHouse(SudokuColumn column)
         => new(column.Puzzle, 9 + column.X);
 
-    public static implicit operator SudokuRegion(SudokuSquare square)
+    public static implicit operator SudokuHouse(SudokuSquare square)
         => new(square.Puzzle, 18 + square.Index);
 
     IEnumerator IEnumerable.GetEnumerator() => Cells.GetEnumerator();

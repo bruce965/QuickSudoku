@@ -26,9 +26,9 @@ public static class SudokuSolver
 
             foreach (var value in cell.CandidateValues)
             {
-                // exclude all values in the same region
-                foreach (var region in cell.Regions)
-                    if (region.Contains(value))
+                // exclude all values in the same house
+                foreach (var house in cell.Houses)
+                    if (house.Contains(value))
                         cell.CandidateValues.Remove(value);
             }
 
@@ -52,7 +52,7 @@ public static class SudokuSolver
     {
         int hiddenSinglesFound = 0;
 
-        foreach (var region in puzzle.Regions)
+        foreach (var house in puzzle.Houses)
         {
             for (var candidate = 1; candidate <= 9; candidate++)
             {
@@ -62,7 +62,7 @@ public static class SudokuSolver
                 SudokuCell? allowedIn = null;
                 var skipCandidate = false;
 
-                foreach (var cell in region.Cells)
+                foreach (var cell in house.Cells)
                 {
                     if (cell.MayContain(candidate))
                     {
@@ -101,9 +101,9 @@ public static class SudokuSolver
         if (maxCount == 0)
             return 0;
 
-        foreach (var region in puzzle.Regions)
+        foreach (var house in puzzle.Houses)
         {
-            foreach (var intersection in region.IntersectingRegions)
+            foreach (var intersection in house.IntersectingHouses)
             {
                 for (var candidate = 1; candidate <= 9; candidate++)
                 {

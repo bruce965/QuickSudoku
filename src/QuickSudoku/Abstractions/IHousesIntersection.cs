@@ -1,22 +1,22 @@
 ﻿namespace QuickSudoku.Abstractions;
 
 /// <summary>
-/// Intersection between two regions of the puzzle board.
+/// Intersection between two houses of the puzzle board.
 /// </summary>
-public interface IRegionsIntersection
+public interface IHousesIntersection
 {
     /// <summary>
-    /// First region.
+    /// First house.
     /// </summary>
-    IRegion First { get; }
+    IHouse First { get; }
 
     /// <summary>
-    /// Second region.
+    /// Second house.
     /// </summary>
-    IRegion Second { get; }
+    IHouse Second { get; }
 
     /// <summary>
-    /// Cells in common between the two regions.
+    /// Cells in common between the two houses.
     /// </summary>
     IEnumerable<ICell> Cells => First.Cells.Intersect(Second.Cells);
 }

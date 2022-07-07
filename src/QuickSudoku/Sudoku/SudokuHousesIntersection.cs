@@ -2,30 +2,30 @@
 
 namespace QuickSudoku.Sudoku;
 
-public struct SudokuRegionsIntersection : IRegionsIntersection
+public struct SudokuHousesIntersection : IHousesIntersection
 {
-    /// <inheritdoc cref="IRegionsIntersection.First"/>
-    public SudokuRegion First { get; }
+    /// <inheritdoc cref="IHousesIntersection.First"/>
+    public SudokuHouse First { get; }
     
-    /// <inheritdoc cref="IRegionsIntersection.Second"/>
-    public SudokuRegion Second { get; }
+    /// <inheritdoc cref="IHousesIntersection.Second"/>
+    public SudokuHouse Second { get; }
 
-    ///// <inheritdoc cref="IRegionsIntersection.Cells"/>
-    //public SudokuRegion Cells { get; }  // TODO
+    ///// <inheritdoc cref="IHousesIntersection.Cells"/>
+    //public SudokuHouse Cells { get; }  // TODO
 
-    internal SudokuRegionsIntersection(SudokuRegion first, SudokuRegion second)
+    internal SudokuHousesIntersection(SudokuHouse first, SudokuHouse second)
     {
         First = first;
         Second = second;
     }
 
-    #region IRegionsIntersection
+    #region IHousesIntersection
 
-    IRegion IRegionsIntersection.First => First;
+    IHouse IHousesIntersection.First => First;
 
-    IRegion IRegionsIntersection.Second => Second;
+    IHouse IHousesIntersection.Second => Second;
 
-    //IEnumerable<ICell> IRegionsIntersection.Cells => Cells;  // TODO
+    //IEnumerable<ICell> IHousesIntersection.Cells => Cells;  // TODO
 
     #endregion
 }

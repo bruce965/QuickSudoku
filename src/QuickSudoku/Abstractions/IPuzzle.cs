@@ -3,12 +3,12 @@
 /// <summary>
 /// Generic puzzle board.
 /// </summary>
-public interface IPuzzle : IRegion, ICloneable
+public interface IPuzzle : IHouse, ICloneable
 {
     /// <summary>
-    /// Regions on this puzzle board.
+    /// Houses on this puzzle board.
     /// </summary>
-    IEnumerable<IRegion> Regions { get; }
+    IEnumerable<IHouse> Houses { get; }
 
     /// <inheritdoc cref="ICloneable.Clone"/>
     new IPuzzle Clone() => (IPuzzle)((ICloneable)this).Clone();

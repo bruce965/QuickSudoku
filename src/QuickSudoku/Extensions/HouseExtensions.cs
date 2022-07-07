@@ -2,30 +2,30 @@
 
 namespace QuickSudoku.Extensions;
 
-public static class RegionExtensions
+public static class HouseExtensions
 {
     /// <summary>
-    /// Check whether all cells in a region are solved.
+    /// Check whether all cells in a house are solved.
     /// </summary>
-    /// <param name="region"></param>
+    /// <param name="house"></param>
     /// <returns></returns>
-    public static bool IsSolved(this IRegion region)
-        => region.Cells.All(c => c.IsSolved());
+    public static bool IsSolved(this IHouse house)
+        => house.Cells.All(c => c.IsSolved());
 
     /// <summary>
-    /// Check whether a solution may exist for all cells in a region.
+    /// Check whether a solution may exist for all cells in a house.
     /// </summary>
-    /// <param name="region"></param>
+    /// <param name="house"></param>
     /// <returns></returns>
-    public static bool HasSolution(this IRegion region)
-        => region.Cells.All(c => c.HasSolution());
+    public static bool HasSolution(this IHouse house)
+        => house.Cells.All(c => c.HasSolution());
 
     /// <summary>
-    /// Check whether a region contains a certain value in a solved cell.
+    /// Check whether a house contains a certain value in a solved cell.
     /// </summary>
-    /// <param name="region"></param>
+    /// <param name="house"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static bool Contains(this IRegion region, object value)
-        => region.Cells.Any(cell => cell.Contains(value));
+    public static bool Contains(this IHouse house, object value)
+        => house.Cells.Any(cell => cell.Contains(value));
 }

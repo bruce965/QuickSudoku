@@ -11,9 +11,9 @@ public interface ICell : IEquatable<ICell>
     IPuzzle Puzzle { get; }
 
     /// <summary>
-    /// Regions this cell is part of.
+    /// Houses this cell is part of.
     /// </summary>
-    IEnumerable<IRegion> Regions => Puzzle.Regions.Where(r => r.Cells.Contains(this));
+    IEnumerable<IHouse> Houses => Puzzle.Houses.Where(r => r.Cells.Contains(this));
 
     /// <summary>
     /// Values legal on this cell.

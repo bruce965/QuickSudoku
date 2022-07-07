@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace QuickSudoku.Sudoku;
 
 [DebuggerDisplay($"{{{nameof(DebuggerDisplay)},nq}}")]
-public readonly struct SudokuSquare : IRegion, IEquatable<SudokuSquare>, IEnumerable<ICell>
+public readonly struct SudokuSquare : IHouse, IEquatable<SudokuSquare>, IEnumerable<ICell>
 {
     public SudokuPuzzle Puzzle { get; }
 
@@ -54,15 +54,15 @@ public readonly struct SudokuSquare : IRegion, IEquatable<SudokuSquare>, IEnumer
         Index = index;
     }
 
-    #region IRegion
+    #region IHouse
 
-    IPuzzle IRegion.Puzzle => Puzzle;
+    IPuzzle IHouse.Puzzle => Puzzle;
 
-    IEnumerable<object> IRegion.LegalValues => SudokuPuzzle.LegalValues;
+    IEnumerable<object> IHouse.LegalValues => SudokuPuzzle.LegalValues;
 
-    IEnumerable<ICell> IRegion.Cells => this;
+    IEnumerable<ICell> IHouse.Cells => this;
 
-    public bool Equals(IRegion? other)
+    public bool Equals(IHouse? other)
         => other is SudokuSquare s && Equals(s);
 
     #endregion

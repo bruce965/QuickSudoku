@@ -1,31 +1,31 @@
 ﻿namespace QuickSudoku.Sudoku.Extensions;
 
-public static class RegionExtensions
+public static class HouseExtensions
 {
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.IsSolved"/>
-    public static bool IsSolved(this SudokuRegion region)
+    /// <inheritdoc cref="QuickSudoku.Extensions.HouseExtensions.IsSolved"/>
+    public static bool IsSolved(this SudokuHouse house)
     {
-        foreach (var cell in region.Cells)
+        foreach (var cell in house.Cells)
             if (!cell.IsSolved())
                 return false;
 
         return true;
     }
 
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.HasSolution"/>
-    public static bool HasSolution(this SudokuRegion region)
+    /// <inheritdoc cref="QuickSudoku.Extensions.HouseExtensions.HasSolution"/>
+    public static bool HasSolution(this SudokuHouse house)
     {
-        foreach (var cell in region.Cells)
+        foreach (var cell in house.Cells)
             if (!cell.HasSolution())
                 return false;
 
         return true;
     }
 
-    /// <inheritdoc cref="QuickSudoku.Extensions.RegionExtensions.Contains"/>
-    public static bool Contains(this SudokuRegion region, int value)
+    /// <inheritdoc cref="QuickSudoku.Extensions.HouseExtensions.Contains"/>
+    public static bool Contains(this SudokuHouse house, int value)
     {
-        foreach (var cell in region.Cells)
+        foreach (var cell in house.Cells)
             if (cell.Contains(value))
                 return true;
 
@@ -35,48 +35,48 @@ public static class RegionExtensions
     #region SudokuRow
 
     /// <inheritdoc cref="IsSolved"/>
-    public static bool IsSolved(this SudokuRow region)
-        => ((SudokuRegion)region).IsSolved();
+    public static bool IsSolved(this SudokuRow house)
+        => ((SudokuHouse)house).IsSolved();
 
     /// <inheritdoc cref="HasSolution"/>
-    public static bool HasSolution(this SudokuRow region)
-        => ((SudokuRegion)region).HasSolution();
+    public static bool HasSolution(this SudokuRow house)
+        => ((SudokuHouse)house).HasSolution();
 
     /// <inheritdoc cref="Contains"/>
-    public static bool Contains(this SudokuRow region, int value)
-        => ((SudokuRegion)region).Contains(value);
+    public static bool Contains(this SudokuRow house, int value)
+        => ((SudokuHouse)house).Contains(value);
 
     #endregion
 
     #region SudokuColumn
 
     /// <inheritdoc cref="IsSolved"/>
-    public static bool IsSolved(this SudokuColumn region)
-        => ((SudokuRegion)region).IsSolved();
+    public static bool IsSolved(this SudokuColumn house)
+        => ((SudokuHouse)house).IsSolved();
 
     /// <inheritdoc cref="HasSolution"/>
-    public static bool HasSolution(this SudokuColumn region)
-        => ((SudokuRegion)region).HasSolution();
+    public static bool HasSolution(this SudokuColumn house)
+        => ((SudokuHouse)house).HasSolution();
 
     /// <inheritdoc cref="Contains"/>
-    public static bool Contains(this SudokuColumn region, int value)
-        => ((SudokuRegion)region).Contains(value);
+    public static bool Contains(this SudokuColumn house, int value)
+        => ((SudokuHouse)house).Contains(value);
 
     #endregion
 
     #region SudokuSquare
 
     /// <inheritdoc cref="IsSolved"/>
-    public static bool IsSolved(this SudokuSquare region)
-        => ((SudokuRegion)region).IsSolved();
+    public static bool IsSolved(this SudokuSquare house)
+        => ((SudokuHouse)house).IsSolved();
 
     /// <inheritdoc cref="HasSolution"/>
-    public static bool HasSolution(this SudokuSquare region)
-        => ((SudokuRegion)region).HasSolution();
+    public static bool HasSolution(this SudokuSquare house)
+        => ((SudokuHouse)house).HasSolution();
 
     /// <inheritdoc cref="Contains"/>
-    public static bool Contains(this SudokuSquare region, int value)
-        => ((SudokuRegion)region).Contains(value);
+    public static bool Contains(this SudokuSquare house, int value)
+        => ((SudokuHouse)house).Contains(value);
 
     #endregion
 }

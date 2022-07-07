@@ -3,32 +3,32 @@
 /// <summary>
 /// Group of cells on the puzzle board.
 /// 
-/// Each value can only appear once in each region.
+/// Each value can only appear once in each house.
 /// </summary>
-public interface IRegion : IEquatable<IRegion>
+public interface IHouse : IEquatable<IHouse>
 {
-    record Intersection(IRegion First, IRegion Second) : IRegionsIntersection;
+    record Intersection(IHouse First, IHouse Second) : IHousesIntersection;
 
     /// <summary>
-    /// Puzzle this region is part of.
+    /// Puzzle this house is part of.
     /// </summary>
     IPuzzle Puzzle { get; }
 
     /// <summary>
-    /// Values legal in this region.
+    /// Values legal in this house.
     /// </summary>
     IEnumerable<object> LegalValues => Puzzle.LegalValues;
 
     /// <summary>
-    /// Cells in this region.
+    /// Cells in this house.
     /// </summary>
     IEnumerable<ICell> Cells { get; }
 
     /// <summary>
-    /// Regions in the puzzle intersecting with this region.
+    /// Houses in the puzzle intersecting with this house.
     /// </summary>
-    IEnumerable<IRegionsIntersection> IntersectingRegions
-        => Puzzle.Regions
+    IEnumerable<IHousesIntersection> IntersectingHouses
+        => Puzzle.Houses
             .Select(r => new Intersection(this, r))
-            .Where(i => i.First != i.Second && ((IRegionsIntersection)i).Cells.Any());
+            .Where(i => i.First != i.Second && ((IHousesIntersection)i).Cells.Any());
 }

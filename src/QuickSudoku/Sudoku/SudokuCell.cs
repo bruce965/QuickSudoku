@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace QuickSudoku.Sudoku;
 
 [DebuggerDisplay($"{{{nameof(DebuggerDisplay)},nq}}")]
-public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<IRegion>
+public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<IHouse>
 {
     [DebuggerDisplay($"{{{nameof(DebuggerDisplay)},nq}}")]
     public readonly struct CellCandidateValues : IValuesCollection<int>, IValuesCollection<object>
@@ -148,7 +148,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
     public SudokuRow Row => new(Puzzle, Index.Y);
     public SudokuColumn Column => new(Puzzle, Index.X);
     public SudokuSquare Square => new(Puzzle, Index.Square);
-    public CellRegions Regions => new(this);
+    public CellHouses Houses => new(this);
 
     /// <summary>
     /// Get or set digits allowed on this cell.
@@ -197,7 +197,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
     IPuzzle ICell.Puzzle => Puzzle;
 
-    IEnumerable<IRegion> ICell.Regions => this;
+    IEnumerable<IHouse> ICell.Houses => this;
 
     IEnumerable<object> ICell.LegalValues => SudokuPuzzle.LegalValues;
 
@@ -207,16 +207,16 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
     #endregion
 
-    #region IEnumerable<IRegion>
+    #region IEnumerable<IHouse>
 
-    IEnumerator<IRegion> IEnumerable<IRegion>.GetEnumerator()
+    IEnumerator<IHouse> IEnumerable<IHouse>.GetEnumerator()
     {
         yield return Row;
         yield return Column;
         yield return Square;
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<IRegion>)this).GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<IHouse>)this).GetEnumerator();
 
     #endregion
 
@@ -238,16 +238,16 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
     #endregion
 
-    #region CellRegions
+    #region CellHouses
 
-    public struct CellRegions : IReadOnlyList<SudokuRegion>
+    public struct CellHouses : IReadOnlyList<SudokuHouse>
     {
-        public struct Enumerator : IEnumerator<SudokuRegion>
+        public struct Enumerator : IEnumerator<SudokuHouse>
         {
             readonly SudokuCell _cell;
             int _index;
 
-            public SudokuRegion Current
+            public SudokuHouse Current
             {
                 get
                 {
@@ -286,9 +286,9 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
         readonly SudokuCell _cell;
 
-        int IReadOnlyCollection<SudokuRegion>.Count => 3;
+        int IReadOnlyCollection<SudokuHouse>.Count => 3;
 
-        public SudokuRegion this[int index] => index switch
+        public SudokuHouse this[int index] => index switch
         {
             0 => _cell.Row,
             1 => _cell.Column,
@@ -296,14 +296,14 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
             _ => throw new ArgumentOutOfRangeException(nameof(index))
         };
 
-        internal CellRegions(SudokuCell cell)
+        internal CellHouses(SudokuCell cell)
         {
             _cell = cell;
         }
 
         public Enumerator GetEnumerator() => new(_cell);
 
-        IEnumerator<SudokuRegion> IEnumerable<SudokuRegion>.GetEnumerator() => GetEnumerator();
+        IEnumerator<SudokuHouse> IEnumerable<SudokuHouse>.GetEnumerator() => GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
