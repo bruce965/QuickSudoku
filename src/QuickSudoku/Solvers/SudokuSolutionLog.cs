@@ -21,7 +21,10 @@ public class SudokuSolutionLog : ISudokuSolutionLog
 
     public void Push(SudokuSolutionStrategy strategy, int difficulty, int count = 1)
     {
-        _adoptedStrategies[strategy] += count;
+        if (!_adoptedStrategies.TryGetValue(strategy, out var previousCount))
+            previousCount = 0;
+
+        _adoptedStrategies[strategy] = previousCount + count;
         Difficulty += difficulty * count;
     }
 }

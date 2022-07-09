@@ -16,6 +16,24 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
         public SudokuDigits Digits => Ref;
 
+        public int Count
+        {
+            get
+            {
+                // https://stackoverflow.com/a/12171691
+                var value = (int)Ref;
+
+                var count = 0;
+                while (value != 0)
+                {
+                    count++;
+                    value &= value - 1;
+                }
+
+                return count;
+            }
+        }
+
         internal string DebuggerDisplay
         {
             get
@@ -89,26 +107,23 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
             public Enumerator(SudokuDigits digits)
             {
                 _digits = digits;
-                _value = -1;
+                _value = 0;
             }
 
             public bool MoveNext()
             {
-                if (_value < 0)
-                    _value = 0;
-
                 _value++;
 
                 for (; _value <= 9; _value++)
                     if (((int)_digits & (1 << (_value - 1))) != 0)
                         break;
 
-                return _value < 9;
+                return _value <= 9;
             }
 
             public void Reset()
             {
-                _value = -1;
+                _value = 0;
             }
 
             public void Dispose() { }

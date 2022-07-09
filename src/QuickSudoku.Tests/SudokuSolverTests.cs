@@ -74,25 +74,25 @@ public class SudokuSolverTests
     public void TestNakedPair()
     {
         var puzzle = SudokuPuzzle.FromScheme(@"
-            123 ... ...
-            .45 ... ...
-            .67 ... ...
+           >.12 ... ...
+           >.34 ... ...
+            567 ... ...
 
            >... ... ...
-           >... ... ...
-           >... ... ...
+            ... ... ...
+            ... ... ...
 
-           >... ... ...
-           >... ... ...
-           >... ... ...
+            ... ... ...
+            ... ... ...
+            ... ... ...
         ");
 
         // remove candidates through other methods before attempting to solve naked pairs
         SudokuSolver.SolveNakedSingles(puzzle);
 
-        // ensure that previous methods did not already find the naked pairs
+        // ensure that previous methods did not already find the naked pair
+        Assert.Equal(SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 0].CandidateValues.Digits);
         Assert.Equal(SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 1].CandidateValues.Digits);
-        Assert.Equal(SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 2].CandidateValues.Digits);
 
         Assert.True(puzzle[0, 3].CandidateValues.Contains(8));
         Assert.True(puzzle[0, 3].CandidateValues.Contains(9));
@@ -103,7 +103,7 @@ public class SudokuSolverTests
 
         var allocAfter = GC.GetTotalAllocatedBytes(true);
 
-        Assert.Equal(2, nakedPairsFound);
+        Assert.Equal(1, nakedPairsFound);
 
         Assert.False(puzzle[0, 3].CandidateValues.Contains(8));
         Assert.False(puzzle[0, 3].CandidateValues.Contains(9));
@@ -115,38 +115,37 @@ public class SudokuSolverTests
     public void TestNakedTriple()
     {
         var puzzle = SudokuPuzzle.FromScheme(@"
-            .12 ... ...
-            .34 ... ...
+           >.12 ... ...
+           >.34 ... ...
             .56 ... ...
 
            >... ... ...
-           >... ... ...
-           >... ... ...
+            ... ... ...
+            ... ... ...
 
-           >... ... ...
-           >... ... ...
-           >... ... ...
+            ... ... ...
+            ... ... ...
+            ... ... ...
         ");
 
-        // remove candidates through other methods before attempting to solve naked triples
+        // remove candidates through other methods before attempting to solve naked pairs
         SudokuSolver.SolveNakedSingles(puzzle);
-        SudokuSolver.SolveNakedPairs(puzzle);
 
+        // ensure that previous methods did not already find the naked pair
+        Assert.Equal(SudokuDigits.Digit7 | SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 0].CandidateValues.Digits);
         Assert.Equal(SudokuDigits.Digit7 | SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 1].CandidateValues.Digits);
-        Assert.Equal(SudokuDigits.Digit7 | SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 2].CandidateValues.Digits);
 
-        // ensure that previous methods did not already find the naked triples
         Assert.True(puzzle[0, 3].CandidateValues.Contains(7));
         Assert.True(puzzle[0, 3].CandidateValues.Contains(8));
         Assert.True(puzzle[0, 3].CandidateValues.Contains(9));
 
         var allocBefore = GC.GetTotalAllocatedBytes(true);
 
-        var nakedTriplesFound = SudokuSolver.SolveNakedTriples(puzzle);
+        var nakedPairsFound = SudokuSolver.SolveNakedTriples(puzzle);
 
         var allocAfter = GC.GetTotalAllocatedBytes(true);
 
-        Assert.Equal(3, nakedTriplesFound);
+        Assert.Equal(1, nakedPairsFound);
 
         Assert.False(puzzle[0, 3].CandidateValues.Contains(7));
         Assert.False(puzzle[0, 3].CandidateValues.Contains(8));
@@ -154,4 +153,89 @@ public class SudokuSolverTests
 
         //Assert.True(allocAfter == allocBefore, "No memory should have been allocated.");
     }
+
+    //[Fact]
+    //public void TestNakedPair()
+    //{
+    //    var puzzle = SudokuPuzzle.FromScheme(@"
+    //        123 ... ...
+    //        .45 ... ...
+    //        .67 ... ...
+    //
+    //       >... ... ...
+    //       >... ... ...
+    //       >... ... ...
+    //
+    //       >... ... ...
+    //       >... ... ...
+    //       >... ... ...
+    //    ");
+    //
+    //    // remove candidates through other methods before attempting to solve naked pairs
+    //    SudokuSolver.SolveNakedSingles(puzzle);
+    //
+    //    // ensure that previous methods did not already find the naked pairs
+    //    Assert.Equal(SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 1].CandidateValues.Digits);
+    //    Assert.Equal(SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 2].CandidateValues.Digits);
+    //
+    //    Assert.True(puzzle[0, 3].CandidateValues.Contains(8));
+    //    Assert.True(puzzle[0, 3].CandidateValues.Contains(9));
+    //
+    //    var allocBefore = GC.GetTotalAllocatedBytes(true);
+    //
+    //    var nakedPairsFound = SudokuSolver.SolveNakedPairs(puzzle);
+    //
+    //    var allocAfter = GC.GetTotalAllocatedBytes(true);
+    //
+    //    Assert.Equal(2, nakedPairsFound);
+    //
+    //    Assert.False(puzzle[0, 3].CandidateValues.Contains(8));
+    //    Assert.False(puzzle[0, 3].CandidateValues.Contains(9));
+    //
+    //    //Assert.True(allocAfter == allocBefore, "No memory should have been allocated.");
+    //}
+
+    //[Fact]
+    //public void TestNakedTriple()
+    //{
+    //    var puzzle = SudokuPuzzle.FromScheme(@"
+    //        .12 ... ...
+    //        .34 ... ...
+    //        .56 ... ...
+    //
+    //       >... ... ...
+    //       >... ... ...
+    //       >... ... ...
+    //
+    //       >... ... ...
+    //       >... ... ...
+    //       >... ... ...
+    //    ");
+    //
+    //    // remove candidates through other methods before attempting to solve naked triples
+    //    SudokuSolver.SolveNakedSingles(puzzle);
+    //    SudokuSolver.SolveNakedPairs(puzzle);
+    //
+    //    Assert.Equal(SudokuDigits.Digit7 | SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 1].CandidateValues.Digits);
+    //    Assert.Equal(SudokuDigits.Digit7 | SudokuDigits.Digit8 | SudokuDigits.Digit9, puzzle[0, 2].CandidateValues.Digits);
+    //
+    //    // ensure that previous methods did not already find the naked triples
+    //    Assert.True(puzzle[0, 3].CandidateValues.Contains(7));
+    //    Assert.True(puzzle[0, 3].CandidateValues.Contains(8));
+    //    Assert.True(puzzle[0, 3].CandidateValues.Contains(9));
+    //
+    //    var allocBefore = GC.GetTotalAllocatedBytes(true);
+    //
+    //    var nakedTriplesFound = SudokuSolver.SolveNakedTriples(puzzle);
+    //
+    //    var allocAfter = GC.GetTotalAllocatedBytes(true);
+    //
+    //    Assert.Equal(3, nakedTriplesFound);
+    //
+    //    Assert.False(puzzle[0, 3].CandidateValues.Contains(7));
+    //    Assert.False(puzzle[0, 3].CandidateValues.Contains(8));
+    //    Assert.False(puzzle[0, 3].CandidateValues.Contains(9));
+    //
+    //    //Assert.True(allocAfter == allocBefore, "No memory should have been allocated.");
+    //}
 }
