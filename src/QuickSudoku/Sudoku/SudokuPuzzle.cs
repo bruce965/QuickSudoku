@@ -71,6 +71,9 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
     public virtual SudokuPuzzle Clone()
         => new(_data);
 
+    public virtual void CopyTo(SudokuPuzzle puzzle)
+        => _data.CopyTo(puzzle._data.AsSpan());
+
     #region IPuzzle
 
     internal static readonly IReadOnlyList<object> LegalValues = new object[]

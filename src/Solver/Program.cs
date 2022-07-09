@@ -1,4 +1,5 @@
 ﻿using QuickSudoku.Extensions;
+using QuickSudoku.Generators;
 using QuickSudoku.Solvers;
 using QuickSudoku.Sudoku;
 using System.Diagnostics;
@@ -6,32 +7,49 @@ using System.Diagnostics;
 if (args.Length < 1)
 {
     PrintHelp();
+
     Environment.Exit(5);
+    return;
 }
 
-string scheme;
-if (args[0] == "--in")
+SudokuPuzzle puzzle;
+var log = new SudokuSolutionLog();
+var stopwatch = new Stopwatch();
+var totalTime = TimeSpan.Zero;
+
+if (args[0] == "--generate")
+{
+    var timerStart = stopwatch.ElapsedTicks;
+    stopwatch.Start();
+
+    puzzle = SudokuGenerator.GenerateSolved();
+
+    stopwatch.Stop();
+    var timerEnd = stopwatch.ElapsedTicks;
+
+    var generationDuration = TimeSpan.FromTicks(timerEnd - timerStart);
+    totalTime += generationDuration;
+}
+else if (args[0] == "--in")
 {
     using var stdin = Console.OpenStandardInput();
     using var reader = new StreamReader(stdin);
-    scheme = await reader.ReadToEndAsync();
+
+    var scheme = await reader.ReadToEndAsync();
+    puzzle = SudokuPuzzle.FromScheme(scheme);
 }
 else
 {
-    scheme = args[0];
+    var scheme = args[0];
+    puzzle = SudokuPuzzle.FromScheme(scheme);
 }
-
-var puzzle = SudokuPuzzle.FromScheme(scheme);
 
 Console.WriteLine();
 Console.WriteLine("== Puzzle ==");
 PrintPuzzle(puzzle, null);
 
 var stepIndex = 0;
-var log = new SudokuSolutionLog();
-var stopwatch = new Stopwatch();
-var totalTime = TimeSpan.Zero;
-while (!log.Solved)
+while (!puzzle.IsSolved())
 {
     var previous = puzzle.Clone();
 
@@ -65,8 +83,8 @@ while (!log.Solved)
 
 Console.WriteLine();
 Console.WriteLine("== Result ==", ++stepIndex);
-Console.WriteLine("Puzzle solved? {0}", log.Solved ? "yes" : "no");
-Console.WriteLine("Puzzle difficulty: {0}{1}", log.Difficulty, log.Solved ? "" : "+");
+Console.WriteLine("Puzzle solved? {0}", puzzle.IsSolved() ? "yes" : "no");
+Console.WriteLine("Puzzle difficulty: {0}{1}", log.Difficulty, puzzle.IsSolved() ? "" : "+");
 Console.WriteLine("Total time: {0:0.000}ms", totalTime.TotalMilliseconds);
 Console.WriteLine();
 Console.WriteLine("Strategies:");
@@ -74,6 +92,9 @@ foreach (var strategy in log.AdoptedStrategies)
 {
     Console.WriteLine("* {0} applied {1} time{2}", strategy.Key, strategy.Value, strategy.Value > 1 ? "s" : "");
 }
+if (!log.AdoptedStrategies.Any())
+    Console.WriteLine("  none");
+
 
 void PrintHelp()
 {
@@ -87,6 +108,7 @@ void PrintHelp()
         $"{versionInfo.LegalCopyright}",
         "",
         "Usage:",
+        $"  {process.ProcessName} --generate",
         $"  {process.ProcessName} --in | cat \"(puzzle scheme)\"",
         $"  {process.ProcessName} \"(puzzle scheme)\"",
         "",

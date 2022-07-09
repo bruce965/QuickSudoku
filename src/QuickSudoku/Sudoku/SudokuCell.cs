@@ -8,7 +8,7 @@ namespace QuickSudoku.Sudoku;
 public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<IHouse>
 {
     [DebuggerDisplay($"{{{nameof(DebuggerDisplay)},nq}}")]
-    public readonly struct CellCandidateValues : IValuesCollection<int>, IValuesCollection<object>
+    public readonly struct CellCandidateValues : IValuesCollection<int>
     {
         readonly SudokuCell _cell;
 
@@ -133,27 +133,31 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
         IEnumerator<int> IEnumerable<int>.GetEnumerator() => GetEnumerator();
 
-        #endregion
-
-        #region IValuesCollection<object>
-
-        void IValuesCollection<object>.Add(object item)
-            => Add((int)item);
-
-        bool IValuesCollection<object>.Contains(object item)
-            => item is int v && Contains(v);
-
-        void IValuesCollection<object>.Remove(object item)
-        {
-            if (item is int v)
-                Remove(v);
-        }
-
-        IEnumerator<object> IEnumerable<object>.GetEnumerator() => GetEnumerator();
-
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
+    }
+
+    readonly record struct CellCandidateValuesCollection(CellCandidateValues Values) : IValuesCollection<object>
+    {
+        public void Add(object item)
+            => Values.Add((int)item);
+
+        public bool Contains(object item)
+            => item is int v && Values.Contains(v);
+
+        public void Remove(object item)
+        {
+            if (item is int v)
+                Values.Remove(v);
+        }
+
+        public void Reset()
+            => Values.Reset();
+
+        public IEnumerator<object> GetEnumerator() => Values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     public SudokuPuzzle Puzzle { get; }
@@ -216,7 +220,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
     IEnumerable<object> ICell.LegalValues => SudokuPuzzle.LegalValues;
 
-    IValuesCollection<object> ICell.CandidateValues => new CellCandidateValues(this);
+    IValuesCollection<object> ICell.CandidateValues => new CellCandidateValuesCollection(CandidateValues);
 
     bool IEquatable<ICell>.Equals(ICell? other) => other is SudokuCell s && Equals(s);
 
