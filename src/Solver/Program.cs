@@ -98,17 +98,17 @@ if (!log.AdoptedStrategies.Any())
 void PrintHelp()
 {
     var process = Process.GetCurrentProcess();
-    var assemlby = typeof(Program).Assembly;
-    var versionInfo = FileVersionInfo.GetVersionInfo(assemlby.Location);
+    var assembly = typeof(Program).Assembly;
+    var versionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
 
     Console.Write(string.Join(Environment.NewLine, new[]
     {
-        $"QuickSudoku {versionInfo.ProductVersion}",
-        $"{versionInfo.LegalCopyright}",
+        $"QuickSudoku {versionInfo.ProductName} {versionInfo.ProductVersion}",
+        versionInfo.LegalCopyright,
         "",
         "Usage:",
         $"  {process.ProcessName} --generate",
-        $"  {process.ProcessName} --in | cat \"(puzzle scheme)\"",
+        $"  cat \"(puzzle scheme)\" | {process.ProcessName} --in",
         $"  {process.ProcessName} \"(puzzle scheme)\"",
         "",
         "Puzzle scheme format:",

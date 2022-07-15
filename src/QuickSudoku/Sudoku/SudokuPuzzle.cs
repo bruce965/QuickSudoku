@@ -431,7 +431,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
         int IReadOnlyCollection<SudokuCell>.Count => 81;
 
-        public SudokuCell this[int y] => new(_puzzle, y);
+        public SudokuCell this[int index] => new(_puzzle, index);
 
         internal PuzzleCells(SudokuPuzzle puzzle)
         {
