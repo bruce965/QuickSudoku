@@ -49,32 +49,31 @@ Console.WriteLine("== Puzzle ==");
 PrintPuzzle(puzzle, null);
 
 var stepIndex = 0;
-while (!puzzle.IsSolved())
+var solutionSteps = SudokuSolver.StepByStep(puzzle).GetEnumerator();
+while (true)
 {
     var previous = puzzle.Clone();
 
     var timerStart = stopwatch.ElapsedTicks;
     stopwatch.Start();
-    
-    var stepStrategy = SudokuSolver.SolveStep(puzzle);
+
+    var hasNextStep = solutionSteps.MoveNext();
 
     stopwatch.Stop();
     var timerEnd = stopwatch.ElapsedTicks;
 
+    if (!hasNextStep)
+        break;
+
     var stepDuration = TimeSpan.FromTicks(timerEnd - timerStart);
     totalTime += stepDuration;
 
+    var step = solutionSteps.Current;
+    log.Push(step);
+
     Console.WriteLine();
     Console.WriteLine("== Step {0} ==", ++stepIndex);
-
-    if (stepStrategy == null)
-        break;
-
-    var strategyFirstUse = !log.AdoptedStrategies.ContainsKey(stepStrategy.Value);
-    var stepDifficulty = SudokuSolver.GetStrategyDifficulty(stepStrategy.Value, strategyFirstUse);
-    log.Push(stepStrategy.Value, stepDifficulty, 1);
-
-    Console.WriteLine("Strategy: {0} (difficulty +{1})", stepStrategy, stepDifficulty);
+    Console.WriteLine("Strategy: {0} (difficulty +{1})", step.Strategy, step.Difficulty);
     Console.WriteLine("Puzzle difficulty: {0}+", log.Difficulty);
     Console.WriteLine("Time: {0:0.000}ms ({1:0.000}ms total)", stepDuration.TotalMilliseconds, totalTime.TotalMilliseconds);
     Console.WriteLine();
@@ -82,7 +81,7 @@ while (!puzzle.IsSolved())
 }
 
 Console.WriteLine();
-Console.WriteLine("== Result ==", ++stepIndex);
+Console.WriteLine("== Result ==");
 Console.WriteLine("Puzzle solved? {0}", puzzle.IsSolved() ? "yes" : "no");
 Console.WriteLine("Puzzle difficulty: {0}{1}", log.Difficulty, puzzle.IsSolved() ? "" : "+");
 Console.WriteLine("Total time: {0:0.000}ms", totalTime.TotalMilliseconds);

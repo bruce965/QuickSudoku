@@ -19,12 +19,12 @@ public class SudokuSolutionLog : ISudokuSolutionLog
 
     public SudokuSolutionLog() { }
 
-    public void Push(SudokuSolutionStrategy strategy, int difficulty, int count = 1)
+    public void Push(SudokuSolutionStep step, int count = 1)
     {
-        if (!_adoptedStrategies.TryGetValue(strategy, out var previousCount))
+        if (!_adoptedStrategies.TryGetValue(step.Strategy, out var previousCount))
             previousCount = 0;
 
-        _adoptedStrategies[strategy] = previousCount + count;
-        Difficulty += difficulty * count;
+        _adoptedStrategies[step.Strategy] = previousCount + count;
+        Difficulty += step.Difficulty * count;
     }
 }

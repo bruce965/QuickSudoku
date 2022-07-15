@@ -11,4 +11,5 @@ public enum SudokuSolutionStrategy
     NakedQuad,
     HiddenQuad,
     IntersectionRemoval,
+    Guess,
 }
