@@ -3,6 +3,7 @@ using QuickSudoku.Generators;
 using QuickSudoku.Solvers;
 using QuickSudoku.Sudoku;
 using System.Diagnostics;
+using System.Reflection;
 
 if (args.Length < 1)
 {
@@ -99,12 +100,15 @@ void PrintHelp()
 {
     var process = Process.GetCurrentProcess();
     var assembly = typeof(Program).Assembly;
-    var versionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+
+    var product = assembly.GetCustomAttribute<AssemblyProductAttribute>();
+    var copyright = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
+    var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
 
     Console.Write(string.Join(Environment.NewLine, new[]
     {
-        $"QuickSudoku {versionInfo.ProductName} {versionInfo.ProductVersion}",
-        versionInfo.LegalCopyright,
+        $"QuickSudoku {product?.Product} {version?.InformationalVersion}",
+        copyright?.Copyright,
         "",
         "Usage:",
         $"  {process.ProcessName} --generate",
