@@ -12,4 +12,10 @@ public interface IPuzzle : IHouse, ICloneable
 
     /// <inheritdoc cref="ICloneable.Clone"/>
     new IPuzzle Clone() => (IPuzzle)((ICloneable)this).Clone();
+
+    /// <summary>
+    /// Copy the state of this puzzle board to another puzzle board of the same type.
+    /// </summary>
+    /// <param name="puzzle">Puzzle board this puzzle board should be copied over.</param>
+    void CopyTo(IPuzzle puzzle);
 }

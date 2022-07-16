@@ -1,18 +1,23 @@
 ﻿namespace QuickSudoku.Solvers;
 
+/// <summary>
+/// Solution options, used to find solutions to puzzles.
+/// </summary>
 public record class SudokuSolutionOptions
 {
+    /// <summary>
+    /// Immutable copy of the default options.
+    /// </summary>
     public static SudokuSolutionOptions Default { get; } = new()
     {
-        //StopIfMultipleSolutions = false,
-        StopAtDifficulty = null,
         ForbiddenStrategies = Array.Empty<SudokuSolutionStrategy>(),
     };
 
-    ///// <summary>
-    ///// Stop if multiple solutions are found.
-    ///// </summary>
-    //public bool StopIfMultipleSolutions { get; init; }
+    /// <summary>
+    /// Stop looking for a solution if the puzzle is deemed
+    /// to have multiple valid solutions.
+    /// </summary>
+    public bool EnsureSingleSolution { get; init; }  // TODO
 
     /// <summary>
     /// Stop looking for a solution if the difficulty gets above this threshold.
@@ -22,5 +27,6 @@ public record class SudokuSolutionOptions
     /// <summary>
     /// Forbid usage of certain solution strategies.
     /// </summary>
-    public ICollection<SudokuSolutionStrategy> ForbiddenStrategies { get; init; } = new HashSet<SudokuSolutionStrategy>();
+    public ICollection<SudokuSolutionStrategy> ForbiddenStrategies { get; init; }
+        = new HashSet<SudokuSolutionStrategy>();
 }

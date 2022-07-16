@@ -23,13 +23,25 @@ if (args[0] == "--generate")
     var timerStart = stopwatch.ElapsedTicks;
     stopwatch.Start();
 
-    puzzle = SudokuGenerator.GenerateSolved();
+    puzzle = SudokuGenerator.Generate(new()
+    {
+        Symmetry = SudokuSymmetry.PreferFull,
+        LimitStrategy = SudokuSolutionStrategy.Guess - 1,
+    });
 
     stopwatch.Stop();
     var timerEnd = stopwatch.ElapsedTicks;
 
     var generationDuration = TimeSpan.FromTicks(timerEnd - timerStart);
     totalTime += generationDuration;
+
+    Console.WriteLine();
+    Console.WriteLine("== Generated ==");
+    PrintPuzzleCompact(puzzle);
+    Console.WriteLine();
+    Console.WriteLine("Generation time: {0:0.000}ms", totalTime.TotalMilliseconds);
+
+    totalTime = TimeSpan.Zero;
 }
 else if (args[0] == "--in")
 {
@@ -129,6 +141,25 @@ void PrintHelp()
         "  ... .8. .79",
         "",
     }));
+}
+
+void PrintPuzzleCompact(SudokuPuzzle puzzle)
+{
+    for (var y = 0; y < 9; y++)
+    {
+        if (y > 0 && (y % 3) == 0)
+            Console.WriteLine();
+
+        for (var x = 0; x < 9; x++)
+        {
+            if (x > 0 && (x % 3) == 0)
+                Console.Write(" ");
+
+            Console.Write("{0}", puzzle[x, y].Value?.ToString() ?? ".");
+        }
+
+        Console.WriteLine();
+    }
 }
 
 void PrintPuzzle(SudokuPuzzle puzzle, SudokuPuzzle? previous)

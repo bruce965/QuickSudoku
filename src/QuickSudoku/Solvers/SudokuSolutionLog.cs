@@ -3,7 +3,11 @@
 public interface ISudokuSolutionLog
 {
     public int Difficulty { get; }
+
     public bool Solved { get; }
+
+    public bool? HasMultipleSolutions { get; }
+
     IReadOnlyDictionary<SudokuSolutionStrategy, int> AdoptedStrategies { get; }
 }
 
@@ -14,6 +18,8 @@ public class SudokuSolutionLog : ISudokuSolutionLog
     public int Difficulty { get; private set; }
 
     public bool Solved { get; set; }
+
+    public bool? HasMultipleSolutions { get; set; }
 
     public IReadOnlyDictionary<SudokuSolutionStrategy, int> AdoptedStrategies => _adoptedStrategies;
 

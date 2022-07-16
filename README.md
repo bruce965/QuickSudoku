@@ -31,7 +31,13 @@ Puzzle scheme format:
   ... .8. .79
 ```
 
-To generate a step-by-step solution:
+To generate a new random puzzle, grade it, and print the solution:
+
+```bash
+Solver --generate
+```
+
+To print the step-by-step solution for an existing puzzle:
 
 ```bash
 # Bash (Unix shell)
@@ -72,23 +78,27 @@ Solver "
 
 ## Library Usage
 
-To generate a solved puzzle:
+To generate a new easy puzzle:
 
 ```csharp
-var puzzle = SudokuGenerator.GenerateSolved();
+var puzzle = SudokuGenerator.Generate(new()
+{
+    Symmetry = SudokuSymmetry.Full,
+    LimitStrategy = SudokuSolutionStrategy.HiddenPair,
+});
 
 for (var y = 0; y < 9; y++)
 {
     for (var x = 0; x < 9; x++)
     {
-        Console.Write("{0}", puzzle[x, y].Value ?? ' ');
+        Console.Write("{0}", puzzle[x, y].Value?.ToString() ?? " ");
     }
 
     Console.WriteLine();
 }
 ```
 
-To grade a puzzle:
+To solve and grade a puzzle:
 
 ```csharp
 var puzzle = SudokuPuzzle.FromScheme(@"
@@ -108,12 +118,6 @@ var puzzle = SudokuPuzzle.FromScheme(@"
 var solution = SudokuSolver.Solve(puzzle);
 
 Console.WriteLine("Difficulty: {0}", solution.Difficulty);
-```
-
-To generate a puzzle:
-
-```csharp
-//TODO
 ```
 
 

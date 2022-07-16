@@ -5,7 +5,7 @@ static class EnumerableExtensions
     /// <summary>
     /// Consume elements in a sequence.
     /// </summary>
-    /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+    /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
     /// <param name="source">A sequence of values to consume.</param>
     public static void Consume<TSource>(this IEnumerable<TSource> source)
     {
@@ -16,7 +16,7 @@ static class EnumerableExtensions
     /// Shift a sequence by a certain amount of elements, moving <paramref name="count"/>
     /// values from the start of the sequence to the end.
     /// </summary>
-    /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+    /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
     /// <param name="source">A sequence of values.</param>
     /// <param name="count">How many values to shift by.</param>
     /// <returns>Shifted sequence of values.</returns>
@@ -49,5 +49,29 @@ static class EnumerableExtensions
 
         for (i = 0; i < start; i++)
             yield return hold[i];
+    }
+
+    /// <summary>
+    /// Randomly shuffle a sequence.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+    /// <param name="source">A sequence of values.</param>
+    /// <param name="random">Random source.</param>
+    /// <returns>Shuffled sequence of values.</returns>
+    public static IEnumerable<TSource> Shuffle<TSource>(this IEnumerable<TSource> source, Random random)
+    {
+        var els = source.ToList();
+
+        // https://en.wikipedia.org/w/index.php?title=Fisher–Yates_shuffle&oldid=1082693296#The_modern_algorithm
+        for (var i = 0; i < els.Count - 1; i++)
+        {
+            var rand = random.Next(i, els.Count);
+
+            var buf = els[i];
+            els[i] = els[rand];
+            els[rand] = buf;
+        }
+
+        return els;
     }
 }

@@ -47,7 +47,7 @@ public static partial class SudokuSolver
     /// </summary>
     /// <param name="puzzle">Puzzle.</param>
     /// <param name="options">Solution options.</param>
-    /// <returns>Enumerable steps towards the solution.</returns>
+    /// <returns>Steps towards the solution.</returns>
     public static IEnumerable<SudokuSolutionStep> StepByStep(SudokuPuzzle puzzle, SudokuSolutionOptions? options = null)
     {
         options ??= SudokuSolutionOptions.Default;

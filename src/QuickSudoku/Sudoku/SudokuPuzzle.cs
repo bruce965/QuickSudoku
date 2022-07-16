@@ -93,6 +93,14 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
     object ICloneable.Clone() => Clone();
 
+    void IPuzzle.CopyTo(IPuzzle puzzle)
+    {
+        if (puzzle is not SudokuPuzzle other)
+            throw new ArgumentException("Incompatible puzzle board.", nameof(puzzle));
+
+        CopyTo(other);
+    }
+
     #endregion
 
     #region IHouse
