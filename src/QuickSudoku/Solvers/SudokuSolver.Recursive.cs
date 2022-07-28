@@ -1,4 +1,5 @@
 ﻿using QuickSudoku.Sudoku;
+using QuickSudoku.Sudoku.Extensions;
 using QuickSudoku.Utilities;
 
 namespace QuickSudoku.Solvers;
@@ -8,8 +9,7 @@ partial class SudokuSolver
     /// <summary>
     /// Solve by recursive strategy .
     ///
-    /// <para>This strategy is slow (about 1ms per-cell) and will
-    /// solve the puzzle completely, assuming a solution exists.</para>
+    /// <para>This strategy will solve the puzzle completely, assuming a solution exists.</para>
     /// </summary>
     /// <param name="puzzle">Puzzle.</param>
     /// <param name="random">
@@ -19,49 +19,69 @@ partial class SudokuSolver
     /// <returns><c>true</c> if a solution was found.</returns>
     public static bool SolveRecursive(SudokuPuzzle puzzle, Random? random = null)
     {
-        var original = puzzle.Clone();
+        // initialize list of values that may be in each cell of the board
+        Span<SudokuDigits> allowed = stackalloc SudokuDigits[81];
+        foreach (ref var c in allowed)
+            c = SudokuDigits.All;
 
-        // get cells with the smallest amount of candidates
-        var cells = puzzle.Cells
-            .Select(c => (Cell: c, CandidatesCount: c.CandidateValues.Count))
-            .Where(c => c.CandidatesCount > 1)
-            .GroupBy(c => c.CandidatesCount)
-            .OrderBy(g => g.Key)
-            .FirstOrDefault()?
-            .Select(c => c.Cell);
+        // do not allow backtracking on cells that were initially assigned in the puzzle
+        Span<bool> initiallyAssigned = stackalloc bool[allowed.Length];
+        for (var i = 0; i < initiallyAssigned.Length; i++)
+            initiallyAssigned[i] = puzzle[i].Value != null;
 
-        // if there are no unsolved cells left, the puzzle is solved
-        if (cells == null)
-            return true;
-
-        // pick a random cell from those with the smallest amount of candidates
-        var cellIndex = random?.Next(cells.Count()) ?? 0;
-        var cell = cells.ElementAt(cellIndex);
-
-        // start from a random candidate and try all until a valid one is found
-        var candidateIndex = random?.Next(cell.CandidateValues.Count) ?? 0;
-        var candidates = original.Cells[cell.Index].CandidateValues.RingShift(candidateIndex);
-
-        foreach (var candidate in candidates)
+        for (var i = 0; i < allowed.Length; i++)
         {
-            // assign candidate to cell
-            cell.Value = candidate;
+            // skip cells which already had a value in original puzzle
+            if (initiallyAssigned[i])
+                continue;
 
-            // solve naked singles exposed by assigning this candidate
-            while (SolveNakedSingles(puzzle) > 0) { }
+            var cell = puzzle[i];
 
-            // attempt solving
-            var solved = SolveRecursive(puzzle, random);
+            // start from a random candidate among those not yet tried in this cell
+            var candidatesCount = allowed[i].Count();
+            var randomShift = random == null ? 0 : random.Next(0, candidatesCount);
 
-            // solved? forward result
-            if (solved)
-                return true;
+            foreach (var candidate in allowed[i].GetDigits().RingShift(randomShift))
+            {
+                // remove candidate from values allowed on this cell, to avoid trying it again
+                allowed[i].Remove(candidate);
 
-            // not solved? undo changes and try with next candidate
-            original.CopyTo(puzzle);
+                if (!cell.Houses.Any(h => h.Contains(candidate)))
+                {
+                    // valid candidate, attempt to assign it to this cell
+                    cell.Value = candidate;
+                    break;
+                }
+            }
+
+            // valid candidate found for this cell, continue
+            if (cell.Value != null)
+                continue;
+
+            // reset all candidates on this cell
+            allowed[i] = SudokuDigits.All;
+
+            // return to previous cell and try with another candidate
+            while (true)
+            {
+                if (--i == -1)
+                {
+                    // all possibile solutions have been tried, puzzle has no solution
+                    return false;
+                }
+
+                // skip cells which were already assigned in original puzzle
+                if (initiallyAssigned[i])
+                    continue;
+
+                // unset previous cell value and try again
+                var previousCell = puzzle[i--];
+                previousCell.Value = null;
+                break;
+            }
         }
 
-        // no more candidates? unsolvable
-        return false;
+        // all cells have a value
+        return true;
     }
 }

@@ -50,38 +50,20 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
         public void Set(int digit)
         {
-            Debug.Assert(digit >= 1 && digit <= 9);
-
-            Ref = (SudokuDigits)(1 << (digit - 1));
+            Ref = SudokuDigitsExtensions.Digit(digit);
         }
 
         public void Add(int digit)
-        {
-            Debug.Assert(digit >= 1 && digit <= 9);
-
-            Ref |= (SudokuDigits)(1 << (digit - 1));
-        }
+            => Ref.Add(digit);
 
         public bool Contains(int digit)
-        {
-            if (digit < 1 || digit > 9)
-                return false;
-
-            return ((int)Ref & (1 << (digit - 1))) != 0;
-        }
+            => Ref.Contains(digit);
 
         public void Remove(int digit)
-        {
-            if (digit < 1 || digit > 9)
-                return;
-
-            Ref &= ~(SudokuDigits)(1 << (digit - 1));
-        }
+            => Ref.Remove(digit);
 
         public void Reset()
-        {
-            Ref = SudokuDigits.All;
-        }
+            => Ref = SudokuDigits.All;
 
         #region IEnumerable<int>
 

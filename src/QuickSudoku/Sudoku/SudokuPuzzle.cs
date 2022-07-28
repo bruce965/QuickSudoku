@@ -465,10 +465,10 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
     public override int GetHashCode()
         => _data.GetHashCode();  // NOTE: could probably be improved.
 
-    public static bool operator ==(SudokuPuzzle left, SudokuPuzzle right)
+    public static bool operator ==(SudokuPuzzle? left, SudokuPuzzle? right)
         => left?._data == right?._data;  // NOTE: this is a by-reference comparison.
 
-    public static bool operator !=(SudokuPuzzle left, SudokuPuzzle right)
+    public static bool operator !=(SudokuPuzzle? left, SudokuPuzzle? right)
         => !(left == right);
 
     #endregion

@@ -56,9 +56,12 @@ public static class SudokuGenerator
 
     /// <summary>
     /// Generate a new valid random puzzle.
+    /// 
+    /// <para>This operation is slow (300ms to several seconds depending on the options).</para>
     /// </summary>
     /// <param name="options">Generation options.</param>
     /// <returns>Generated puzzle.</returns>
+    /// <exception cref="TimeoutException">Failed to generate a puzzle with the specified options.</exception>
     public static SudokuPuzzle Generate(SudokuGenerationOptions? options = null)
     {
         options ??= SudokuGenerationOptions.Default;
@@ -67,8 +70,6 @@ public static class SudokuGenerator
         {
             if (TryGenerate(options, out var puzzle))
                 return puzzle;
-
-            return puzzle;
         }
 
         throw new TimeoutException("Failed to generate a puzzle with the specified options.");
