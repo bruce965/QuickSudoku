@@ -9,7 +9,7 @@ This project is an incomplete work-in-progress.
 ## CLI Usage
 
 ```plaintext
-QuickSudoku Solver 0.2.0-alpha
+QuickSudoku Solver 0.2.1-alpha
 Copyright (c) 2022 Fabio Iotti.
 
 Usage:
