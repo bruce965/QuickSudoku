@@ -10,7 +10,7 @@ This project is an incomplete work-in-progress.
 
 ```plaintext
 QuickSudoku Solver 0.2.1-alpha
-Copyright (c) 2022 Fabio Iotti.
+Copyright (c) 2022-2025 Fabio Iotti.
 
 Usage:
   Solver --generate
@@ -123,7 +123,7 @@ Console.WriteLine("Difficulty: {0}", solution.Difficulty);
 
 ## License
 
-Copyright (c) 2024 Fabio Iotti
+Copyright (c) 2022-2025 Fabio Iotti
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU Affero General Public License as published by the Free

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <VersionPrefix>0.2.1</VersionPrefix>
     <VersionSuffix>alpha</VersionSuffix>
-    <Copyright>Copyright (c) 2022 Fabio Iotti.</Copyright>
+    <Copyright>Copyright (c) 2022-2025 Fabio Iotti.</Copyright>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
