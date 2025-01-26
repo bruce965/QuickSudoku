@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿// SPDX-FileCopyrightText: Copyright 2025 Fabio Iotti
+// SPDX-License-Identifier: AGPL-3.0-only
+
+using System.Collections;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 

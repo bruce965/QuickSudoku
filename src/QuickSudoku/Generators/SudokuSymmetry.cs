@@ -1,4 +1,7 @@
-﻿namespace QuickSudoku.Generators;
+﻿// SPDX-FileCopyrightText: Copyright 2025 Fabio Iotti
+// SPDX-License-Identifier: AGPL-3.0-only
+
+namespace QuickSudoku.Generators;
 
 /// <summary>
 /// Level of symmetry in the generated puzzle board.

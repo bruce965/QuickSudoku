@@ -1,4 +1,7 @@
-﻿using QuickSudoku.Utilities;
+﻿// SPDX-FileCopyrightText: Copyright 2025 Fabio Iotti
+// SPDX-License-Identifier: AGPL-3.0-only
+
+using QuickSudoku.Utilities;
 using System.Collections;
 using System.ComponentModel;
 
