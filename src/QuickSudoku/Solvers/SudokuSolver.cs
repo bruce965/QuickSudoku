@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: Copyright 2025 Fabio Iotti
 // SPDX-License-Identifier: AGPL-3.0-only
 
+using System.Collections.Immutable;
 using QuickSudoku.Sudoku;
 using QuickSudoku.Sudoku.Extensions;
 using QuickSudoku.Utilities;
@@ -16,9 +17,8 @@ public static partial class SudokuSolver
     /// <summary>
     /// Known solution strategies ordered by increasing difficulty, except for naked singles and guessing.
     /// </summary>
-    static readonly IReadOnlyCollection<(SudokuSolutionStrategy Strategy, int FirstUseDifficulty, int Difficulty, Func<SudokuPuzzle, int> Solve)> Strategies
-        = new (SudokuSolutionStrategy, int, int, Func<SudokuPuzzle, int>)[]
-    {
+    static readonly ImmutableArray<(SudokuSolutionStrategy Strategy, int FirstUseDifficulty, int Difficulty, Func<SudokuPuzzle, int> Solve)> Strategies =
+    [
         (SudokuSolutionStrategy.HiddenSingle,         1,   1, puzzle => SolveHiddenSingles(puzzle, 1)),
         (SudokuSolutionStrategy.NakedPair,            5,   3, puzzle => SolveNakedPairs(puzzle, 1)),
         (SudokuSolutionStrategy.HiddenPair,           5,   3, puzzle => SolveHiddenPairs(puzzle, 1)),
@@ -27,7 +27,7 @@ public static partial class SudokuSolver
         (SudokuSolutionStrategy.NakedQuad,           30,  20, puzzle => SolveNakedQuads(puzzle, 1)),
         (SudokuSolutionStrategy.HiddenQuad,          50,  30, puzzle => SolveHiddenQuads(puzzle, 1)),
         (SudokuSolutionStrategy.IntersectionRemoval, 12,   7, puzzle => SolveIntersectionRemovals(puzzle, 1).Intersections),
-    };
+    ];
 
     /// <summary>
     /// Solve a puzzle.
@@ -35,11 +35,11 @@ public static partial class SudokuSolver
     /// <param name="puzzle">Puzzle.</param>
     /// <param name="options">Solution options.</param>
     /// <returns>Log of the strategies adopted to solve the puzzle.</returns>
-    public static ISudokuSolutionLog Solve(SudokuPuzzle puzzle, SudokuSolutionOptions? options = null)
+    public static SudokuSolutionLog Solve(SudokuPuzzle puzzle, SudokuSolutionOptions? options = null)
     {
         options ??= SudokuSolutionOptions.Default;
 
-        var sudokuLog = new SudokuSolutionLog();
+        SudokuSolutionLog sudokuLog = new();
         SolveStepByStep(puzzle, sudokuLog, options, true).Consume();
 
         return sudokuLog;
@@ -83,13 +83,13 @@ public static partial class SudokuSolver
             if (!puzzle.HasSolution())
                 break;
 
-            var step = SolveStep(
+            SudokuSolutionStep? step = SolveStep(
                 puzzle,
                 log,
                 options,
                 ref solution,
                 groupNakedSingles ? -1 : 1,
-                out var nakedSinglesFound);
+                out int nakedSinglesFound);
             
             if (!step.HasValue)
             {
@@ -97,7 +97,7 @@ public static partial class SudokuSolver
                 break;
             }
 
-            var count = step.Value.Strategy == SudokuSolutionStrategy.NakedSingle ? nakedSinglesFound : 1;
+            int count = step.Value.Strategy switch { SudokuSolutionStrategy.NakedSingle => nakedSinglesFound, _ => 1 };
             log.Push(step.Value, count);
 
             yield return step.Value;
@@ -106,7 +106,7 @@ public static partial class SudokuSolver
 
     static SudokuSolutionStep? SolveStep(
         SudokuPuzzle puzzle,
-        ISudokuSolutionLog log,
+        SudokuSolutionLog log,
         SudokuSolutionOptions options,
         ref SudokuPuzzle? solution,
         int maxNakedSingles,
@@ -125,16 +125,16 @@ public static partial class SudokuSolver
         }
 
         // solve with other strategies
-        foreach (var strategy in Strategies)
+        foreach ((SudokuSolutionStrategy strategy, int firstUseDifficulty, int difficulty, Func<SudokuPuzzle, int> solve) in Strategies)
         {
-            if (options.ForbiddenStrategies.Contains(strategy.Strategy))
+            if (options.ForbiddenStrategies.Contains(strategy))
                 continue;
 
-            var foundCount = strategy.Solve(puzzle);
+            int foundCount = solve(puzzle);
             if (foundCount > 0)
             {
-                var isFirstUse = !log.AdoptedStrategies.ContainsKey(strategy.Strategy);
-                return new (strategy.Strategy, isFirstUse ? strategy.FirstUseDifficulty : strategy.Difficulty);
+                bool isFirstUse = !log.AdoptedStrategies.ContainsKey(strategy);
+                return new (strategy, isFirstUse ? firstUseDifficulty : difficulty);
             }
         }
 
@@ -145,12 +145,12 @@ public static partial class SudokuSolver
             {
                 solution = puzzle.Clone();
 
-                var hasSolution = SolveRecursive(solution);
+                bool hasSolution = SolveRecursive(solution);
                 if (!hasSolution)
                     return null;
             }
 
-            var isFirstGuess = !log.AdoptedStrategies.ContainsKey(SudokuSolutionStrategy.Guess);
+            bool isFirstGuess = !log.AdoptedStrategies.ContainsKey(SudokuSolutionStrategy.Guess);
             SolveGuessing(puzzle, solution, 1);
 
             return new(SudokuSolutionStrategy.Guess, isFirstGuess ? FirstGuessDifficulty : GuessDifficulty);

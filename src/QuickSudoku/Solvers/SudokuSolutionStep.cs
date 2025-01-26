@@ -6,7 +6,7 @@ namespace QuickSudoku.Solvers;
 /// <summary>
 /// Step towards the solution.
 /// </summary>
-public struct SudokuSolutionStep
+public readonly struct SudokuSolutionStep
 {
     /// <summary>
     /// Strategy adopted for this step.

@@ -1,6 +1,8 @@
 ﻿// SPDX-FileCopyrightText: Copyright 2025 Fabio Iotti
 // SPDX-License-Identifier: AGPL-3.0-only
 
+using QuickSudoku.Utilities;
+
 namespace QuickSudoku.Abstractions;
 
 /// <summary>
@@ -14,7 +16,7 @@ public interface IPuzzle : IHouse, ICloneable
     IEnumerable<IHouse> Houses { get; }
 
     /// <inheritdoc cref="ICloneable.Clone"/>
-    new IPuzzle Clone() => (IPuzzle)((ICloneable)this).Clone();
+    new IPuzzle Clone() => (IPuzzle)Upcast.To<ICloneable>(this).Clone();
 
     /// <summary>
     /// Copy the state of this puzzle board to another puzzle board of the same type.

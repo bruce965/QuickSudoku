@@ -24,27 +24,27 @@ partial class SudokuSolver
     {
         // initialize list of values that may be in each cell of the board
         Span<SudokuDigits> allowed = stackalloc SudokuDigits[81];
-        foreach (ref var c in allowed)
+        foreach (ref SudokuDigits c in allowed)
             c = SudokuDigits.All;
 
         // do not allow backtracking on cells that were initially assigned in the puzzle
         Span<bool> initiallyAssigned = stackalloc bool[allowed.Length];
-        for (var i = 0; i < initiallyAssigned.Length; i++)
-            initiallyAssigned[i] = puzzle[i].Value != null;
+        for (int i = 0; i < initiallyAssigned.Length; i++)
+            initiallyAssigned[i] = puzzle[i].Value is not null;
 
-        for (var i = 0; i < allowed.Length; i++)
+        for (int i = 0; i < allowed.Length; i++)
         {
             // skip cells which already had a value in original puzzle
             if (initiallyAssigned[i])
                 continue;
 
-            var cell = puzzle[i];
+            SudokuCell cell = puzzle[i];
 
             // start from a random candidate among those not yet tried in this cell
-            var candidatesCount = allowed[i].Count();
-            var randomShift = random == null ? 0 : random.Next(0, candidatesCount);
+            int candidatesCount = allowed[i].Count();
+            int randomShift = random is null ? 0 : random.Next(0, candidatesCount);
 
-            foreach (var candidate in allowed[i].GetDigits().RingShift(randomShift))
+            foreach (int candidate in allowed[i].GetDigits().RingShift(randomShift))
             {
                 // remove candidate from values allowed on this cell, to avoid trying it again
                 allowed[i].Remove(candidate);
@@ -58,7 +58,7 @@ partial class SudokuSolver
             }
 
             // valid candidate found for this cell, continue
-            if (cell.Value != null)
+            if (cell.Value is not null)
                 continue;
 
             // reset all candidates on this cell
@@ -78,7 +78,7 @@ partial class SudokuSolver
                     continue;
 
                 // unset previous cell value and try again
-                var previousCell = puzzle[i--];
+                SudokuCell previousCell = puzzle[i--];
                 previousCell.Value = null;
                 break;
             }

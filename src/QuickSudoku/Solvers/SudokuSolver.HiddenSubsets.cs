@@ -19,7 +19,7 @@ partial class SudokuSolver
     {
         int hiddenSubsetsFound = 0;
 
-        if (maxCount == 0)
+        if (maxCount is 0)
             return 0;
 
         // A hidden subset of size N occurs when N digits appear
@@ -28,15 +28,15 @@ partial class SudokuSolver
         // When a naked subset is found, any other digits in those
         // cells can be eliminated from candidates.
 
-        foreach (var house in puzzle.Houses)
+        foreach (SudokuHouse house in puzzle.Houses)
         {
-            for (var candidate = 1; candidate <= 9; candidate++)
+            for (int candidate = 1; candidate <= 9; candidate++)
             {
-                var subsetCells = house.Cells.Where(c => c.MayContain(candidate));
+                IEnumerable<SudokuCell> subsetCells = house.Cells.Where(c => c.MayContain(candidate));
 
                 if (subsetCells.Count() == subsetSize)
                 {
-                    foreach (var cell in subsetCells)
+                    foreach (SudokuCell cell in subsetCells)
                     {
                         // TODO
                     }

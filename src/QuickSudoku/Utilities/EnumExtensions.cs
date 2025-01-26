@@ -10,7 +10,7 @@ namespace QuickSudoku.Utilities;
 static class EnumExtensions
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FlagIndices : IEnumerable<int>
+    public readonly struct FlagIndices : IEnumerable<int>
     {
         public struct Enumerator : IEnumerator<int>
         {
@@ -21,13 +21,13 @@ static class EnumExtensions
             readonly byte _count;
             sbyte _current;
 
-            public int Current
+            public readonly int Current
             {
                 get
                 {
                     if (_current < 0)
                     {
-                        if (_current == NotStarted)
+                        if (_current is NotStarted)
                             throw new InvalidOperationException("Enumeration has not started. Call MoveNext.");
 
                         throw new InvalidOperationException("Enumeration already finished.");
@@ -37,7 +37,7 @@ static class EnumExtensions
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             internal Enumerator(ulong value, byte flagsCount)
             {
@@ -48,12 +48,12 @@ static class EnumExtensions
 
             public bool MoveNext()
             {
-                if (_current == Finished)
+                if (_current is Finished)
                     throw new InvalidOperationException("Enumeration already finished.");
 
                 for (; ++_current < _count;)
                 {
-                    var flag = _value & (ulong)(1 << _current);
+                    ulong flag = _value & (ulong)(1 << _current);
                     if (flag != 0)
                         return true;
                 }
@@ -65,7 +65,7 @@ static class EnumExtensions
             public void Reset()
                 => _current = NotStarted;
 
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
         }
 
         readonly ulong _value;
@@ -88,23 +88,23 @@ static class EnumExtensions
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct Flags<T> : IEnumerable<T> where T : unmanaged, Enum
+    public readonly struct Flags<T> : IEnumerable<T> where T : unmanaged, Enum
     {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public struct Enumerator : IEnumerator<T>
         {
-            FlagIndices.Enumerator _indexEnumerator;  // not readonly
+            FlagIndices.Enumerator _indexEnumerator; // not readonly
 
-            public T Current
+            public readonly T Current
             {
                 get
                 {
-                    var x = 1UL << _indexEnumerator.Current;
+                    ulong x = 1UL << _indexEnumerator.Current;
                     return Unsafe.As<ulong, T>(ref x);
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             internal Enumerator(T value)
             {
@@ -117,7 +117,7 @@ static class EnumExtensions
             public void Reset()
                 => _indexEnumerator.Reset();
 
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
         }
 
         readonly T _value;
@@ -147,7 +147,7 @@ static class EnumExtensions
     /// <returns><c>true</c> if the bit field or fields are also set.</returns>
     public static bool HasFlag<T>(this T value, T flag) where T : unmanaged, Enum
     {
-        var x = AsULong(value) & AsULong(flag);
+        ulong x = AsULong(value) & AsULong(flag);
         return x != 0;
     }
 
@@ -160,7 +160,7 @@ static class EnumExtensions
     /// <returns>Copy of <paramref name="value"/>, with the bit field or fields also set.</returns>
     public static T AddFlag<T>(this T value, T flag) where T : unmanaged, Enum
     {
-        var x = AsULong(value) | AsULong(flag);
+        ulong x = AsULong(value) | AsULong(flag);
         return Unsafe.As<ulong, T>(ref x);
     }
 
@@ -173,7 +173,7 @@ static class EnumExtensions
     /// <returns>Copy of <paramref name="value"/>, without the bit field or fields also set.</returns>
     public static T RemoveFlag<T>(this T value, T flag) where T : unmanaged, Enum
     {
-        var x = AsULong(value) & ~AsULong(flag);
+        ulong x = AsULong(value) & ~AsULong(flag);
         return Unsafe.As<ulong, T>(ref x);
     }
 
@@ -185,8 +185,8 @@ static class EnumExtensions
     /// <returns>Number of bit fields set.</returns>
     public static int CountFlags<T>(this T value) where T : unmanaged, Enum
     {
-        var i = AsULong(value);
-        i = i - ((i >> 1) & 0x5555555555555555UL);
+        ulong i = AsULong(value);
+        i -= (i >> 1) & 0x5555555555555555UL;
         i = (i & 0x3333333333333333UL) + ((i >> 2) & 0x3333333333333333UL);
         return (int)(unchecked(((i + (i >> 4)) & 0xF0F0F0F0F0F0F0FUL) * 0x101010101010101UL) >> 56);
     }
@@ -201,7 +201,7 @@ static class EnumExtensions
     /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is higher than the number of set bit fields.</exception>
     public static T GetFlag<T>(this T value, int index) where T : unmanaged, Enum
     {
-        if (!TryGetFlag(value, index, out var flag))
+        if (!TryGetFlag(value, index, out T flag))
             throw new IndexOutOfRangeException();
 
         return flag;
@@ -217,10 +217,10 @@ static class EnumExtensions
     /// <returns><c>true</c> if <paramref name="index"/> is not higher than the number of set bit fields.</returns>
     public static bool TryGetFlag<T>(this T value, int index, out T flag) where T : unmanaged, Enum
     {
-        if (TryGetFlagIndex(value, index, out var flagIndex))
+        if (TryGetFlagIndex(value, index, out int flagIndex))
         {
-            var x = AsULong(value);
-            var f = x & (ulong)(1 << flagIndex);
+            ulong x = AsULong(value);
+            ulong f = x & (ulong)(1 << flagIndex);
             
             flag = Unsafe.As<ulong, T>(ref f);
             return true;
@@ -240,7 +240,7 @@ static class EnumExtensions
     /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is higher than the number of set bit fields.</exception>
     public static int GetFlagIndex<T>(this T value, int index) where T : unmanaged, Enum
     {
-        if (!TryGetFlagIndex(value, index, out var flagIndex))
+        if (!TryGetFlagIndex(value, index, out int flagIndex))
             throw new IndexOutOfRangeException();
 
         return flagIndex;
@@ -256,12 +256,12 @@ static class EnumExtensions
     /// <returns><c>true</c> if <paramref name="index"/> is not higher than the number of set bit fields.</returns>
     public static bool TryGetFlagIndex<T>(this T value, int index, out int flagIndex) where T : unmanaged, Enum
     {
-        var x = AsULong(value);
+        ulong x = AsULong(value);
 
-        var flagsCount = Unsafe.SizeOf<T>() * 8;
+        int flagsCount = Unsafe.SizeOf<T>() * 8;
         for (flagIndex = 0; flagIndex < flagsCount; flagIndex++)
         {
-            var f = x & (ulong)(1 << flagIndex);
+            ulong f = x & (ulong)(1 << flagIndex);
             if (f != 0 && --index == -1)
                 return true;
         }
@@ -290,18 +290,12 @@ static class EnumExtensions
 
     static ulong AsULong<T>(this T value) where T : unmanaged, Enum
     {
-        if (Unsafe.SizeOf<T>() == sizeof(byte))
-            return Unsafe.As<T, byte>(ref value);
-        
-        if (Unsafe.SizeOf<T>() == sizeof(ushort))
-            return Unsafe.As<T, ushort>(ref value);
-        
-        if (Unsafe.SizeOf<T>() == sizeof(uint))
-            return Unsafe.As<T, uint>(ref value);
-        
-        if (Unsafe.SizeOf<T>() == sizeof(ulong))
-            return Unsafe.As<T, ulong>(ref value);
-        
-        throw new NotImplementedException();
+        return Unsafe.SizeOf<T>() switch {
+            sizeof(byte) => Unsafe.As<T, byte>(ref value),
+            sizeof(ushort) => Unsafe.As<T, ushort>(ref value),
+            sizeof(uint) => Unsafe.As<T, uint>(ref value),
+            sizeof(ulong) => Unsafe.As<T, ulong>(ref value),
+            _ => throw new NotImplementedException()
+        };
     }
 }

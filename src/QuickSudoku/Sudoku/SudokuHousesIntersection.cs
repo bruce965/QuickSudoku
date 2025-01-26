@@ -5,7 +5,7 @@ using QuickSudoku.Abstractions;
 
 namespace QuickSudoku.Sudoku;
 
-public struct SudokuHousesIntersection : IHousesIntersection
+public readonly struct SudokuHousesIntersection : IHousesIntersection
 {
     /// <inheritdoc cref="IHousesIntersection.First"/>
     public SudokuHouse First { get; }
@@ -14,7 +14,7 @@ public struct SudokuHousesIntersection : IHousesIntersection
     public SudokuHouse Second { get; }
 
     ///// <inheritdoc cref="IHousesIntersection.Cells"/>
-    //public SudokuHouse Cells { get; }  // TODO
+    //public SudokuHouse Cells { get; } // TODO
 
     internal SudokuHousesIntersection(SudokuHouse first, SudokuHouse second)
     {
@@ -28,7 +28,7 @@ public struct SudokuHousesIntersection : IHousesIntersection
 
     IHouse IHousesIntersection.Second => Second;
 
-    //IEnumerable<ICell> IHousesIntersection.Cells => Cells;  // TODO
+    //IEnumerable<ICell> IHousesIntersection.Cells => Cells; // TODO
 
     #endregion
 }

@@ -18,16 +18,16 @@ partial class SudokuSolver
     public static void SolveGuessing(SudokuPuzzle puzzle, SudokuPuzzle solution, int count = -1)
     {
         // order cells with by smallest amount of candidates (like a human would do), then by index
-        var cells = puzzle.Cells
+        IEnumerable<SudokuCell> cells = puzzle.Cells
             .Select(c => (Cell: c, CandidatesCount: c.CandidateValues.Count))
             .Where(c => c.CandidatesCount > 1)
             .OrderBy(c => c.CandidatesCount).ThenBy(c => c.Cell.Index.Index)
             .Select(c => c.Cell);
 
-        if (count != -1)
+        if (count is not -1)
             cells = cells.Take(count);
 
-        foreach (var cell in cells)
+        foreach (SudokuCell cell in cells)
         {
             cell.Value = solution.Cells[cell.Index].Value;
         }

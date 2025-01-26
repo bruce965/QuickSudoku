@@ -5,7 +5,7 @@ namespace QuickSudoku.Abstractions;
 
 /// <summary>
 /// Group of cells on the puzzle board.
-/// 
+///
 /// Each value can only appear once in each house.
 /// </summary>
 public interface IHouse : IEquatable<IHouse>

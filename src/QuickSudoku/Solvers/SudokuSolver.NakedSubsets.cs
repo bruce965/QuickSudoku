@@ -18,7 +18,7 @@ partial class SudokuSolver
     {
         int nakedSubsetsFound = 0;
 
-        if (maxCount == 0)
+        if (maxCount is 0)
             return 0;
 
         // A naked subset of size N occurs when N digits are the sole
@@ -27,27 +27,27 @@ partial class SudokuSolver
         // When a naked subset is found, those digits can be eliminated
         // from candidates in all other cells in the same house.
 
-        foreach (var house in puzzle.Houses)
+        foreach (SudokuHouse house in puzzle.Houses)
         {
-            foreach (var cell in house.Cells)
+            foreach (SudokuCell cell in house.Cells)
             {
                 // if a cell in this region has the correct number number of candidates,
                 // check if a naked subset is found for these candidates
                 if (cell.CandidateValues.Count == subsetSize)
                 {
                     // find other cells that only contain these candidates
-                    var subsetCells = house.Cells.Where(c => !((IEnumerable<int>)c.CandidateValues).Except(cell.CandidateValues).Any());
+                    IEnumerable<SudokuCell> subsetCells = house.Cells.Where(c => !((IEnumerable<int>)c.CandidateValues).Except(cell.CandidateValues).Any());
 
                     // if the correct amount of cells is found, a naked subset is found
                     // but it is only useful if another cell in the same house contains one of the candidates
                     if (subsetCells.Count() == subsetSize)
                     {
-                        var nakedSubsetFound = false;
+                        bool nakedSubsetFound = false;
 
-                        var otherCells = house.Cells.Except(subsetCells);
-                        foreach (var cell2 in otherCells)
+                        IEnumerable<SudokuCell> otherCells = house.Cells.Except(subsetCells);
+                        foreach (SudokuCell cell2 in otherCells)
                         {
-                            foreach (var candidate in cell.CandidateValues)
+                            foreach (int candidate in cell.CandidateValues)
                             {
                                 if (!cell2.CandidateValues.Contains(candidate))
                                     continue;
@@ -61,7 +61,7 @@ partial class SudokuSolver
                         {
                             nakedSubsetsFound++;
 
-                            if (maxCount != -1 && nakedSubsetsFound >= maxCount)
+                            if (maxCount is not -1 && nakedSubsetsFound >= maxCount)
                                 return nakedSubsetsFound;
                         }
                     }

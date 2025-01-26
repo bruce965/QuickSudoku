@@ -81,15 +81,15 @@ Solver "
 To generate a new easy puzzle:
 
 ```csharp
-var puzzle = SudokuGenerator.Generate(new()
+SudokuPuzzle puzzle = SudokuGenerator.Generate(new()
 {
     Symmetry = SudokuSymmetry.Full,
     LimitStrategy = SudokuSolutionStrategy.HiddenPair,
 });
 
-for (var y = 0; y < 9; y++)
+for (int y = 0; y < 9; y++)
 {
-    for (var x = 0; x < 9; x++)
+    for (int x = 0; x < 9; x++)
     {
         Console.Write("{0}", puzzle[x, y].Value?.ToString() ?? " ");
     }
@@ -101,7 +101,7 @@ for (var y = 0; y < 9; y++)
 To solve and grade a puzzle:
 
 ```csharp
-var puzzle = SudokuPuzzle.FromScheme(@"
+SudokuPuzzle puzzle = SudokuPuzzle.FromScheme(@"
     53. .7. ...
     6.. 195 ...
     .98 ... .6.
@@ -115,7 +115,7 @@ var puzzle = SudokuPuzzle.FromScheme(@"
     ... .8. .79
 ");
 
-var solution = SudokuSolver.Solve(puzzle);
+ISudokuSolutionLog solution = SudokuSolver.Solve(puzzle);
 
 Console.WriteLine("Difficulty: {0}", solution.Difficulty);
 ```

@@ -85,14 +85,14 @@ public readonly struct SudokuHouse : IHouse, IEquatable<SudokuHouse>, IEnumerabl
 
     #region HouseCells
 
-    public struct HouseCells : IReadOnlyList<SudokuCell>
+    public readonly struct HouseCells : IReadOnlyList<SudokuCell>
     {
         public struct Enumerator : IEnumerator<SudokuCell>
         {
             readonly SudokuHouse _row;
             int _index;
 
-            public SudokuCell Current
+            public readonly SudokuCell Current
             {
                 get
                 {
@@ -102,7 +102,7 @@ public readonly struct SudokuHouse : IHouse, IEquatable<SudokuHouse>, IEnumerabl
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public Enumerator(SudokuHouse house)
             {
@@ -121,7 +121,7 @@ public readonly struct SudokuHouse : IHouse, IEquatable<SudokuHouse>, IEnumerabl
                 _index = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         readonly SudokuHouse _house;
@@ -146,16 +146,16 @@ public readonly struct SudokuHouse : IHouse, IEquatable<SudokuHouse>, IEnumerabl
 
     #region HouseIntersections
 
-    int _intersectionsCount => _index < 18 ? 12 : 6;  // row/col = 12, square = 6
+    int _intersectionsCount => _index < 18 ? 12 : 6; // row/col = 12, square = 6
 
-    public struct HouseIntersections : IReadOnlyList<SudokuHousesIntersection>
+    public readonly struct HouseIntersections : IReadOnlyList<SudokuHousesIntersection>
     {
         public struct Enumerator : IEnumerator<SudokuHousesIntersection>
         {
             readonly SudokuHouse _house;
             int _index;
 
-            public SudokuHousesIntersection Current
+            public readonly SudokuHousesIntersection Current
             {
                 get
                 {
@@ -165,7 +165,7 @@ public readonly struct SudokuHouse : IHouse, IEquatable<SudokuHouse>, IEnumerabl
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public Enumerator(SudokuHouse house)
             {
@@ -184,7 +184,7 @@ public readonly struct SudokuHouse : IHouse, IEquatable<SudokuHouse>, IEnumerabl
                 _index = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         readonly SudokuHouse _house;

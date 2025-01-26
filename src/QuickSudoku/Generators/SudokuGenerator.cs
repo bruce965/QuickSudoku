@@ -16,10 +16,10 @@ public static class SudokuGenerator
     static readonly SudokuCellIndex[][] HorizontalSymmetries
         = Enumerable.Range(0, 5)
             .SelectMany(y => Enumerable.Range(0, 9).Select(x => new SudokuCellIndex(x, y)))
-            .Select(i => i.X == 4
-                ? new[] { i }
-                : new[] { i, new(8 - i.X, i.Y) }
-            )
+            .Select(i => i switch {
+                { X: 4 } => new[] { i },
+                { X: _ } => [i, new(8 - i.X, i.Y)]
+            })
             .ToArray();
 
     /// <summary>
@@ -28,10 +28,10 @@ public static class SudokuGenerator
     static readonly SudokuCellIndex[][] VerticalSymmetries
         = Enumerable.Range(0, 9)
             .SelectMany(y => Enumerable.Range(0, 5).Select(x => new SudokuCellIndex(x, y)))
-            .Select(i => i.Y == 4
-                ? new[] { i }
-                : new[] { i, new(i.X, 8 - i.Y) }
-            )
+            .Select(i => i switch {
+                { Y: 4 } => new[] { i },
+                { Y: _ } => [i, new(i.X, 8 - i.Y)]
+            })
             .ToArray();
 
     /// <summary>
@@ -40,14 +40,12 @@ public static class SudokuGenerator
     static readonly SudokuCellIndex[][] FullSymmetries
         = Enumerable.Range(0, 5)
             .SelectMany(y => Enumerable.Range(0, 5).Select(x => new SudokuCellIndex(x, y)))
-            .Select(i => i.X == 4
-                ? i.Y == 4
-                    ? new[] { i }
-                    : new[] { i, new(i.X, 8 - i.Y) }
-                : i.Y == 4
-                    ? new[] { i, new(8 - i.X, i.Y) }
-                    : new[] { i, new(8 - i.X, i.Y), new(i.X, 8 - i.Y), new(8 - i.X, 8 - i.Y) }
-            )
+            .Select(i => i switch {
+                { X: 4, Y: 4 } => new[] { i },
+                { X: 4, Y: _ } => [i, new(i.X, 8 - i.Y)],
+                { X: _, Y: 4 } => [i, new(8 - i.X, i.Y)],
+                { X: _, Y: _ } => [i, new(8 - i.X, i.Y), new(i.X, 8 - i.Y), new(8 - i.X, 8 - i.Y)]
+            })
             .ToArray();
 
     /// <summary>
@@ -60,7 +58,7 @@ public static class SudokuGenerator
 
     /// <summary>
     /// Generate a new valid random puzzle.
-    /// 
+    ///
     /// <para>This operation is slow (300ms to several seconds depending on the options).</para>
     /// </summary>
     /// <param name="options">Generation options.</param>
@@ -70,9 +68,9 @@ public static class SudokuGenerator
     {
         options ??= SudokuGenerationOptions.Default;
 
-        for (var i = 0; i < 100; i++)
+        for (int i = 0; i < 100; i++)
         {
-            if (TryGenerate(options, out var puzzle))
+            if (TryGenerate(options, out SudokuPuzzle? puzzle))
                 return puzzle;
         }
 
@@ -83,7 +81,7 @@ public static class SudokuGenerator
     {
         options ??= SudokuGenerationOptions.Default;
 
-        var solutionOptions = new SudokuSolutionOptions
+        SudokuSolutionOptions solutionOptions = new()
         {
             EnsureSingleSolution = true,
             StopAtDifficulty = options.MaxDifficulty,
@@ -101,7 +99,7 @@ public static class SudokuGenerator
             options.Symmetry.HasFlag(SudokuSymmetry.Horizontal),
             options.Symmetry.HasFlag(SudokuSymmetry.Vertical),
             solutionOptions,
-            out var solutionLog);
+            out ISudokuSolutionLog? solutionLog);
 
         // if requested to, try to remove even more cells
         if (options.Symmetry.HasFlag(SudokuSymmetry.Loose))
@@ -112,20 +110,20 @@ public static class SudokuGenerator
                 false,
                 false,
                 solutionOptions,
-                out var finalSolutionLog);
+                out ISudokuSolutionLog? finalSolutionLog);
 
             // if more cells have been removed, update the solution log
-            if (finalSolutionLog != null)
+            if (finalSolutionLog is not null)
                 solutionLog = finalSolutionLog;
         }
 
-        if (solutionLog == null)
+        if (solutionLog is null)
         {
             // failed to generate a puzzle (should be extremely rare, or maybe totally impossible)
             return false;
         }
 
-        foreach (var strategy in options.RequiredStrategies)
+        foreach (SudokuSolutionStrategy strategy in options.RequiredStrategies)
         {
             if (!solutionLog.AdoptedStrategies.ContainsKey(strategy))
             {
@@ -135,8 +133,8 @@ public static class SudokuGenerator
         }
 
         // clean up candidates left behind
-        foreach (var cell in puzzle.Cells)
-            if (cell.Value == null)
+        foreach (SudokuCell cell in puzzle.Cells)
+            if (cell.Value is null)
                 cell.CandidateValues.Reset();
 
         return true;
@@ -151,7 +149,7 @@ public static class SudokuGenerator
     /// <returns>Random solved puzzle.</returns>
     public static SudokuPuzzle GenerateSolved(Random? random = null)
     {
-        var puzzle = new SudokuPuzzle();
+        SudokuPuzzle puzzle = new();
         SudokuSolver.SolveRecursive(puzzle, random ?? Random.Shared);
 
         return puzzle;
@@ -167,28 +165,28 @@ public static class SudokuGenerator
     {
         ISudokuSolutionLog? finalSolutionLog = null;
 
-        var symmetricCells = GetSymmetricCells(horizontalSymmetry, verticalSymmetry);
+        SudokuCellIndex[][] symmetricCells = GetSymmetricCells(horizontalSymmetry, verticalSymmetry);
 
-        // buffer uset to store the puzzle before trying to remove cells
-        var removingBuffer = puzzle.Clone();
+        // buffer used to store the puzzle before trying to remove cells
+        SudokuPuzzle removingBuffer = puzzle.Clone();
 
         // buffer used to store the puzzle before attempting to solve
-        var solvingBuffer = puzzle.Clone();
+        SudokuPuzzle solvingBuffer = puzzle.Clone();
 
-        var removedTotal = 0;
+        int removedTotal = 0;
 
         // randomly iterate all symmetric cell groups
-        var candidates = symmetricCells.Shuffle(random);
-        foreach (var symmetryCellIndices in candidates)
+        IEnumerable<SudokuCellIndex[]> candidates = symmetricCells.Shuffle(random);
+        foreach (SudokuCellIndex[]? symmetryCellIndices in candidates)
         {
             // for each of the cells in each symmetric cells group...
-            var removedCount = 0;
-            foreach (var cellIndex in symmetryCellIndices)
+            int removedCount = 0;
+            foreach (SudokuCellIndex cellIndex in symmetryCellIndices)
             {
-                var cell = removingBuffer.Cells[cellIndex];
+                SudokuCell cell = removingBuffer.Cells[cellIndex];
 
-                var value = cell.Value;
-                if (value == null)
+                int? value = cell.Value;
+                if (value is null)
                     continue;
 
                 // empty the cell's value (restore all candidates)
@@ -196,13 +194,13 @@ public static class SudokuGenerator
                 removedCount++;
 
                 //// reset candidates in houses the cell is in
-                //foreach (var house in cell.Houses)
-                //    foreach (var houseCell in house.Cells)
-                //        if (houseCell.Value == null)
+                //foreach (SudokuHouse house in cell.Houses)
+                //    foreach (SudokuCell houseCell in house.Cells)
+                //        if (houseCell.Value is null)
                 //            houseCell.CandidateValues.Reset();
             }
 
-            if (removedCount == 0)
+            if (removedCount is 0)
                 continue;
 
             removingBuffer.CopyTo(solvingBuffer);
@@ -212,7 +210,7 @@ public static class SudokuGenerator
 
             // if removing last set of cells created a puzzle with multiple solutions,
             // discard this attempt and try again with next set of symmetric cells
-            if (!finalSolutionLog.Solved || finalSolutionLog.HasMultipleSolutions == true)
+            if (!finalSolutionLog.Solved || finalSolutionLog.HasMultipleSolutions is true)
             {
                 puzzle.CopyTo(removingBuffer);
                 continue;

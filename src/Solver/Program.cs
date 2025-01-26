@@ -17,13 +17,13 @@ if (args.Length < 1)
 }
 
 SudokuPuzzle puzzle;
-var log = new SudokuSolutionLog();
-var stopwatch = new Stopwatch();
-var totalTime = TimeSpan.Zero;
+SudokuSolutionLog log = new();
+Stopwatch stopwatch = new();
+TimeSpan totalTime = TimeSpan.Zero;
 
-if (args[0] == "--generate")
+if (args[0] is "--generate")
 {
-    var timerStart = stopwatch.ElapsedTicks;
+    long timerStart = stopwatch.ElapsedTicks;
     stopwatch.Start();
 
     puzzle = SudokuGenerator.Generate(new()
@@ -33,9 +33,9 @@ if (args[0] == "--generate")
     });
 
     stopwatch.Stop();
-    var timerEnd = stopwatch.ElapsedTicks;
+    long timerEnd = stopwatch.ElapsedTicks;
 
-    var generationDuration = TimeSpan.FromTicks(timerEnd - timerStart);
+    TimeSpan generationDuration = TimeSpan.FromTicks(timerEnd - timerStart);
     totalTime += generationDuration;
 
     Console.WriteLine();
@@ -46,17 +46,17 @@ if (args[0] == "--generate")
 
     totalTime = TimeSpan.Zero;
 }
-else if (args[0] == "--in")
+else if (args[0] is "--in")
 {
-    using var stdin = Console.OpenStandardInput();
-    using var reader = new StreamReader(stdin);
+    using Stream stdin = Console.OpenStandardInput();
+    using StreamReader reader = new(stdin);
 
-    var scheme = await reader.ReadToEndAsync();
+    string scheme = await reader.ReadToEndAsync();
     puzzle = SudokuPuzzle.FromScheme(scheme);
 }
 else
 {
-    var scheme = args[0];
+    string scheme = args[0];
     puzzle = SudokuPuzzle.FromScheme(scheme);
 }
 
@@ -64,27 +64,27 @@ Console.WriteLine();
 Console.WriteLine("== Puzzle ==");
 PrintPuzzle(puzzle, null);
 
-var stepIndex = 0;
-var solutionSteps = SudokuSolver.StepByStep(puzzle).GetEnumerator();
+int stepIndex = 0;
+IEnumerator<SudokuSolutionStep> solutionSteps = SudokuSolver.StepByStep(puzzle).GetEnumerator();
 while (true)
 {
-    var previous = puzzle.Clone();
+    SudokuPuzzle previous = puzzle.Clone();
 
-    var timerStart = stopwatch.ElapsedTicks;
+    long timerStart = stopwatch.ElapsedTicks;
     stopwatch.Start();
 
-    var hasNextStep = solutionSteps.MoveNext();
+    bool hasNextStep = solutionSteps.MoveNext();
 
     stopwatch.Stop();
-    var timerEnd = stopwatch.ElapsedTicks;
+    long timerEnd = stopwatch.ElapsedTicks;
 
     if (!hasNextStep)
         break;
 
-    var stepDuration = TimeSpan.FromTicks(timerEnd - timerStart);
+    TimeSpan stepDuration = TimeSpan.FromTicks(timerEnd - timerStart);
     totalTime += stepDuration;
 
-    var step = solutionSteps.Current;
+    SudokuSolutionStep step = solutionSteps.Current;
     log.Push(step);
 
     Console.WriteLine();
@@ -103,9 +103,9 @@ Console.WriteLine("Puzzle difficulty: {0}{1}", log.Difficulty, puzzle.IsSolved()
 Console.WriteLine("Total time: {0:0.000}ms", totalTime.TotalMilliseconds);
 Console.WriteLine();
 Console.WriteLine("Strategies:");
-foreach (var strategy in log.AdoptedStrategies)
+foreach ((SudokuSolutionStrategy strategy, int count) in log.AdoptedStrategies)
 {
-    Console.WriteLine("* {0} applied {1} time{2}", strategy.Key, strategy.Value, strategy.Value > 1 ? "s" : "");
+    Console.WriteLine("* {0} applied {1} time{2}", strategy, count, count > 1 ? "s" : "");
 }
 if (!log.AdoptedStrategies.Any())
     Console.WriteLine("  none");
@@ -113,12 +113,12 @@ if (!log.AdoptedStrategies.Any())
 
 void PrintHelp()
 {
-    var process = Process.GetCurrentProcess();
-    var assembly = typeof(Program).Assembly;
+    Process process = Process.GetCurrentProcess();
+    Assembly assembly = typeof(Program).Assembly;
 
-    var product = assembly.GetCustomAttribute<AssemblyProductAttribute>();
-    var copyright = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
-    var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+    AssemblyProductAttribute? product = assembly.GetCustomAttribute<AssemblyProductAttribute>();
+    AssemblyCopyrightAttribute? copyright = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
+    AssemblyInformationalVersionAttribute? version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
 
     Console.Write(string.Join(Environment.NewLine, new[]
     {
@@ -148,12 +148,12 @@ void PrintHelp()
 
 void PrintPuzzleCompact(SudokuPuzzle puzzle)
 {
-    for (var y = 0; y < 9; y++)
+    for (int y = 0; y < 9; y++)
     {
         if (y > 0 && (y % 3) == 0)
             Console.WriteLine();
 
-        for (var x = 0; x < 9; x++)
+        for (int x = 0; x < 9; x++)
         {
             if (x > 0 && (x % 3) == 0)
                 Console.Write(" ");
@@ -167,29 +167,29 @@ void PrintPuzzleCompact(SudokuPuzzle puzzle)
 
 void PrintPuzzle(SudokuPuzzle puzzle, SudokuPuzzle? previous)
 {
-    for (var y = 0; y < 9; y++)
+    for (int y = 0; y < 9; y++)
     {
         if (y > 0 && (y % 3) == 0)
             Console.WriteLine(" -----------|-------------|-----------");
         else if (y > 0)
             Console.WriteLine("            |             |");
 
-        for (var vX = 0; vX < 3; vX++)
+        for (int vX = 0; vX < 3; vX++)
         {
             if (vX != 0)
                 Console.WriteLine();
 
-            for (var x = 0; x < 9; x++)
+            for (int x = 0; x < 9; x++)
             {
                 if (x > 0 && (x % 3) == 0)
                     Console.Write(" | ");
                 else if (x > 0)
                     Console.Write(" ");
 
-                for (var vY = 1; vY <= 3; vY++)
+                for (int vY = 1; vY <= 3; vY++)
                 {
-                    var val = puzzle[x, y].Value;
-                    if (val != null && (previous is null || previous[x, y].Value == val))
+                    int? val = puzzle[x, y].Value;
+                    if (val is not null && (previous is null || previous[x, y].Value == val))
                     {
                         if (vX == 1 && vY == 2)
                         {
@@ -202,17 +202,17 @@ void PrintPuzzle(SudokuPuzzle puzzle, SudokuPuzzle? previous)
                     }
                     else
                     {
-                        var v = (vX * 3 + vY);
-                        var isCandidate = puzzle[x, y].CandidateValues.Contains(v);
+                        int v = vX * 3 + vY;
+                        bool isCandidate = puzzle[x, y].CandidateValues.Contains(v);
 
-                        if (val != null)
+                        if (val is not null)
                             Console.ForegroundColor = ConsoleColor.Green;
 
                         if (isCandidate)
                         {
                             Console.Write(v);
                         }
-                        else if (previous?[x, y].CandidateValues.Contains(v) == true)
+                        else if (previous?[x, y].CandidateValues.Contains(v) ?? false)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.Write("x");
@@ -223,7 +223,7 @@ void PrintPuzzle(SudokuPuzzle puzzle, SudokuPuzzle? previous)
                             Console.Write(".");
                         }
 
-                        if (val != null)
+                        if (val is not null)
                             Console.ResetColor();
                     }
                 }

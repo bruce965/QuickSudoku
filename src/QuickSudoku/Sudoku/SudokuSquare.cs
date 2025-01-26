@@ -44,7 +44,7 @@ public readonly struct SudokuSquare : IHouse, IEquatable<SudokuSquare>, IEnumera
     {
         get
         {
-            var self = this;
+            SudokuSquare self = this;
             return $"Square {X}-{Y}: {string.Join("", Enumerable.Range(0, 9).Select(y => self[y].Value?.ToString() ?? ".").Zip(new[] { "", "", " ", "", "", " ", "", "", "" }).SelectMany(t => new[] { t.First, t.Second }))}";
         }
     }
@@ -74,7 +74,7 @@ public readonly struct SudokuSquare : IHouse, IEquatable<SudokuSquare>, IEnumera
 
     IEnumerator<ICell> IEnumerable<ICell>.GetEnumerator()
     {
-        for (var y = 0; y < 9; y++)
+        for (int y = 0; y < 9; y++)
             yield return this[y];
     }
 
@@ -82,14 +82,14 @@ public readonly struct SudokuSquare : IHouse, IEquatable<SudokuSquare>, IEnumera
 
     #region SquareCells
 
-    public struct SquareCells : IReadOnlyList<SudokuCell>
+    public readonly struct SquareCells : IReadOnlyList<SudokuCell>
     {
         public struct Enumerator : IEnumerator<SudokuCell>
         {
             readonly SudokuSquare _square;
             int _index;
 
-            public SudokuCell Current
+            public readonly SudokuCell Current
             {
                 get
                 {
@@ -99,7 +99,7 @@ public readonly struct SudokuSquare : IHouse, IEquatable<SudokuSquare>, IEnumera
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public Enumerator(SudokuSquare square)
             {
@@ -118,7 +118,7 @@ public readonly struct SudokuSquare : IHouse, IEquatable<SudokuSquare>, IEnumera
                 _index = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         readonly SudokuSquare _square;

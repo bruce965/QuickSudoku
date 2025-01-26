@@ -22,7 +22,7 @@ public readonly struct SudokuRow : IHouse, IEquatable<SudokuRow>, IEnumerable<IC
     {
         get
         {
-            var self = this;
+            SudokuRow self = this;
             return $"Row {Y}: {string.Join("", Enumerable.Range(0, 9).Select(x => self[x].Value?.ToString() ?? "."))}";
         }
     }
@@ -52,7 +52,7 @@ public readonly struct SudokuRow : IHouse, IEquatable<SudokuRow>, IEnumerable<IC
 
     IEnumerator<ICell> IEnumerable<ICell>.GetEnumerator()
     {
-        for (var x = 0; x < 9; x++)
+        for (int x = 0; x < 9; x++)
             yield return this[x];
     }
 
@@ -60,14 +60,14 @@ public readonly struct SudokuRow : IHouse, IEquatable<SudokuRow>, IEnumerable<IC
 
     #region RowCells
 
-    public struct RowCells : IReadOnlyList<SudokuCell>
+    public readonly struct RowCells : IReadOnlyList<SudokuCell>
     {
         public struct Enumerator : IEnumerator<SudokuCell>
         {
             readonly SudokuRow _row;
             int _y;
 
-            public SudokuCell Current
+            public readonly SudokuCell Current
             {
                 get
                 {
@@ -77,7 +77,7 @@ public readonly struct SudokuRow : IHouse, IEquatable<SudokuRow>, IEnumerable<IC
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public Enumerator(SudokuRow row)
             {
@@ -96,7 +96,7 @@ public readonly struct SudokuRow : IHouse, IEquatable<SudokuRow>, IEnumerable<IC
                 _y = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         readonly SudokuRow _row;

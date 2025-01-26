@@ -35,19 +35,19 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
     protected SudokuPuzzle(SudokuDigits[] data) : this()
     {
-        Debug.Assert(data.Length == 81);
+        Debug.Assert(data.Length is 81);
 
         data.CopyTo(_data, 0);
     }
 
     public static SudokuPuzzle FromScheme(string scheme)
     {
-        var puzzle = new SudokuPuzzle();
+        SudokuPuzzle puzzle = new();
 
-        var i = 0;
-        for (var chrIndex = 0; chrIndex < scheme.Length; chrIndex++)
+        int i = 0;
+        for (int chrIndex = 0; chrIndex < scheme.Length; chrIndex++)
         {
-            var chr = scheme[chrIndex];
+            char chr = scheme[chrIndex];
 
             if (chr == '.')
             {
@@ -57,7 +57,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
             {
                 if (i < 81)
                 {
-                    var cell = puzzle[i];
+                    SudokuCell cell = puzzle[i];
                     cell.Value = chr - '0';
                 }
 
@@ -123,13 +123,13 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
     IEnumerator<IHouse> IEnumerable<IHouse>.GetEnumerator()
     {
-        for (var y = 0; y < 9; y++)
+        for (int y = 0; y < 9; y++)
             yield return new SudokuRow(this, y);
 
-        for (var x = 0; x < 9; x++)
+        for (int x = 0; x < 9; x++)
             yield return new SudokuColumn(this, x);
 
-        for (var i = 0; i < 9; i++)
+        for (int i = 0; i < 9; i++)
             yield return new SudokuSquare(this, i);
     }
 
@@ -139,7 +139,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
     IEnumerator<ICell> IEnumerable<ICell>.GetEnumerator()
     {
-        for (var i = 0; i < 81; i++)
+        for (int i = 0; i < 81; i++)
             yield return this[i];
     }
 
@@ -147,14 +147,14 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
     #region PuzzleRows
 
-    public struct PuzzleRows : IReadOnlyList<SudokuRow>
+    public readonly struct PuzzleRows : IReadOnlyList<SudokuRow>
     {
         public struct Enumerator : IEnumerator<SudokuRow>
         {
             readonly SudokuPuzzle _puzzle;
             int _y;
 
-            public SudokuRow Current
+            public readonly SudokuRow Current
             {
                 get
                 {
@@ -164,7 +164,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             internal Enumerator(SudokuPuzzle puzzle)
             {
@@ -183,7 +183,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 _y = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
 
@@ -209,14 +209,14 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
     #region PuzzleColumns
 
-    public struct PuzzleColumns : IReadOnlyList<SudokuColumn>
+    public readonly struct PuzzleColumns : IReadOnlyList<SudokuColumn>
     {
         public struct Enumerator : IEnumerator<SudokuColumn>
         {
             readonly SudokuPuzzle _puzzle;
             int _x;
 
-            public SudokuColumn Current
+            public readonly SudokuColumn Current
             {
                 get
                 {
@@ -226,7 +226,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public Enumerator(SudokuPuzzle puzzle)
             {
@@ -245,7 +245,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 _x = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         readonly SudokuPuzzle _puzzle;
@@ -270,14 +270,14 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
     #region PuzzleSquares
 
-    public struct PuzzleSquares : IReadOnlyList<SudokuSquare>
+    public readonly struct PuzzleSquares : IReadOnlyList<SudokuSquare>
     {
         public struct Enumerator : IEnumerator<SudokuSquare>
         {
             readonly SudokuPuzzle _puzzle;
             int _index;
 
-            public SudokuSquare Current
+            public readonly SudokuSquare Current
             {
                 get
                 {
@@ -287,7 +287,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public Enumerator(SudokuPuzzle puzzle)
             {
@@ -306,7 +306,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 _index = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         readonly SudokuPuzzle _puzzle;
@@ -331,14 +331,14 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
     #region PuzzleHouses
 
-    public struct PuzzleHouses : IReadOnlyList<SudokuHouse>
+    public readonly struct PuzzleHouses : IReadOnlyList<SudokuHouse>
     {
         public struct Enumerator : IEnumerator<SudokuHouse>
         {
             readonly SudokuPuzzle _puzzle;
             int _index;
 
-            public SudokuHouse Current
+            public readonly SudokuHouse Current
             {
                 get
                 {
@@ -354,7 +354,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             internal Enumerator(SudokuPuzzle puzzle)
             {
@@ -373,7 +373,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 _index = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
 
@@ -399,14 +399,14 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
 
     #region PuzzleCells
 
-    public struct PuzzleCells : IReadOnlyList<SudokuCell>
+    public readonly struct PuzzleCells : IReadOnlyList<SudokuCell>
     {
         public struct Enumerator : IEnumerator<SudokuCell>
         {
             readonly SudokuPuzzle _puzzle;
             int _index;
 
-            public SudokuCell Current
+            public readonly SudokuCell Current
             {
                 get
                 {
@@ -416,7 +416,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public Enumerator(SudokuPuzzle puzzle)
             {
@@ -435,7 +435,7 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
                 _index = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         readonly SudokuPuzzle _puzzle;
@@ -466,10 +466,10 @@ public class SudokuPuzzle : IPuzzle, IHouse, IEquatable<SudokuPuzzle>, IEnumerab
         => obj is SudokuRow s && Equals(s);
 
     public override int GetHashCode()
-        => _data.GetHashCode();  // NOTE: could probably be improved.
+        => _data.GetHashCode(); // NOTE: could probably be improved.
 
     public static bool operator ==(SudokuPuzzle? left, SudokuPuzzle? right)
-        => left?._data == right?._data;  // NOTE: this is a by-reference comparison.
+        => left?._data == right?._data; // NOTE: this is a by-reference comparison.
 
     public static bool operator !=(SudokuPuzzle? left, SudokuPuzzle? right)
         => !(left == right);

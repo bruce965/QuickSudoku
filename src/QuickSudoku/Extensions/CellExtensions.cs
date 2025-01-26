@@ -13,7 +13,7 @@ public static class CellExtensions
     /// <param name="cell"></param>
     /// <returns></returns>
     public static bool IsSolved(this ICell cell)
-        => cell.CandidateValues.Take(2).Count() == 1;
+        => cell.CandidateValues.Take(2).Count() is 1;
 
     /// <summary>
     /// Check whether a solution may exist for a cell.

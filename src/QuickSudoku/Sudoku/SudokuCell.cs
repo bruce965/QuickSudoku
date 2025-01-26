@@ -24,9 +24,9 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
             get
             {
                 // https://stackoverflow.com/a/12171691
-                var value = (int)Ref;
+                int value = (int)Ref;
 
-                var count = 0;
+                int count = 0;
                 while (value != 0)
                 {
                     count++;
@@ -41,7 +41,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
         {
             get
             {
-                var self = this;
+                CellCandidateValues self = this;
                 return string.Join("", Enumerable.Range(1, 9).Select(v => self.Contains(v) ? v.ToString() : ""));
             }
         }
@@ -75,7 +75,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
             readonly SudokuDigits _digits;
             int _value;
 
-            public int Current
+            public readonly int Current
             {
                 get
                 {
@@ -85,9 +85,9 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
                 }
             }
 
-            object IEnumerator<object>.Current => Current;
+            readonly object IEnumerator<object>.Current => Current;
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public Enumerator(SudokuDigits digits)
             {
@@ -111,7 +111,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
                 _value = 0;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         public Enumerator GetEnumerator() => new(Ref);
@@ -179,7 +179,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
         };
         set
         {
-            Debug.Assert(value == null || (value >= 1 && value <= 9));
+            Debug.Assert(value is null or (>= 1 and <= 9));
 
             if (value.HasValue)
                 CandidateValues.Set(value.Value);
@@ -244,14 +244,14 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
 
     #region CellHouses
 
-    public struct CellHouses : IReadOnlyList<SudokuHouse>
+    public readonly struct CellHouses : IReadOnlyList<SudokuHouse>
     {
         public struct Enumerator : IEnumerator<SudokuHouse>
         {
             readonly SudokuCell _cell;
             int _index;
 
-            public SudokuHouse Current
+            public readonly SudokuHouse Current
             {
                 get
                 {
@@ -265,7 +265,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             internal Enumerator(SudokuCell cell)
             {
@@ -284,7 +284,7 @@ public readonly struct SudokuCell : ICell, IEquatable<SudokuCell>, IEnumerable<I
                 _index = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
 

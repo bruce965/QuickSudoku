@@ -16,21 +16,21 @@ partial class SudokuSolver
     /// <returns>Number of naked singles solved.</returns>
     public static int SolveNakedSingles(SudokuPuzzle puzzle, int maxCount = -1)
     {
-        var nakedSinglesFound = 0;
+        int nakedSinglesFound = 0;
 
-        if (maxCount == 0)
+        if (maxCount is 0)
             return 0;
 
-        foreach (var cell in puzzle.Cells)
+        foreach (SudokuCell cell in puzzle.Cells)
         {
             // if cell value is already known, skip cell
-            if (cell.Value != null)
+            if (cell.Value is not null)
                 continue;
 
-            foreach (var value in cell.CandidateValues)
+            foreach (int value in cell.CandidateValues)
             {
                 // exclude all values in the same house
-                foreach (var house in cell.Houses)
+                foreach (SudokuHouse house in cell.Houses)
                 {
                     if (house.Contains(value))
                     {
@@ -40,11 +40,11 @@ partial class SudokuSolver
                 }
 
                 // if only one possible value remains, a naked single has been found
-                if (cell.Value != null)
+                if (cell.Value is not null)
                 {
                     nakedSinglesFound++;
 
-                    if (maxCount != -1 && nakedSinglesFound >= maxCount)
+                    if (maxCount is not -1 && nakedSinglesFound >= maxCount)
                         return nakedSinglesFound;
 
                     break;

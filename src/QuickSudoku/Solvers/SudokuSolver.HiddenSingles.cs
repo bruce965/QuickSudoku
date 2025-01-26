@@ -20,21 +20,21 @@ partial class SudokuSolver
     {
         int hiddenSinglesFound = 0;
 
-        foreach (var house in puzzle.Houses)
+        foreach (SudokuHouse house in puzzle.Houses)
         {
-            for (var candidate = 1; candidate <= 9; candidate++)
+            for (int candidate = 1; candidate <= 9; candidate++)
             {
-                if (maxCount != -1 && hiddenSinglesFound >= maxCount)
+                if (maxCount is not -1 && hiddenSinglesFound >= maxCount)
                     return hiddenSinglesFound;
 
                 SudokuCell? allowedIn = null;
-                var skipCandidate = false;
+                bool skipCandidate = false;
 
-                foreach (var cell in house.Cells)
+                foreach (SudokuCell cell in house.Cells)
                 {
                     if (cell.MayContain(candidate))
                     {
-                        if (allowedIn != null)
+                        if (allowedIn is not null)
                         {
                             // allowed in multiple cells? not a hidden single
                             skipCandidate = true;
@@ -48,10 +48,10 @@ partial class SudokuSolver
                 if (skipCandidate)
                     continue;
 
-                if (allowedIn != null && !allowedIn.Value.IsSolved())
+                if (allowedIn is not null && !allowedIn.Value.IsSolved())
                 {
                     // if there is only once cell where this candidate is possible, a hidden single has been found
-                    var cell = allowedIn.Value;
+                    SudokuCell cell = allowedIn.Value;
                     cell.Value = candidate;
 
                     hiddenSinglesFound++;

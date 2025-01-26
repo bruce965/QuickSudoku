@@ -11,13 +11,13 @@ namespace QuickSudoku.Generators;
 /// </summary>
 public record class SudokuGenerationOptions
 {
-    internal static readonly ICollection<SudokuSolutionStrategy> AllStrategies
-        = Enum.GetValues<SudokuSolutionStrategy>();
+    internal static readonly ImmutableArray<SudokuSolutionStrategy> AllStrategies
+        = [.. Enum.GetValues<SudokuSolutionStrategy>()];
 
     /// <summary>
     /// Immutable copy of the default options.
     /// </summary>
-    public static SudokuGenerationOptions Default { get; } = new SudokuGenerationOptions
+    public static SudokuGenerationOptions Default { get; } = new()
     {
         AllowedStrategies = AllStrategies,
         RequiredStrategies = Array.Empty<SudokuSolutionStrategy>(),
@@ -40,14 +40,14 @@ public record class SudokuGenerationOptions
 
     /// <summary>
     /// Limit to puzzles which can be solved with strategies up to this level (inclusive),
-    /// no puzzles with higher difficuly strategies will be generated.
+    /// no puzzles with higher difficulty strategies will be generated.
     /// </summary>
     public SudokuSolutionStrategy LimitStrategy
     {
         get => AllowedStrategies.Max();
-        set
+        init
         {
-            foreach (var strategy in AllStrategies)
+            foreach (SudokuSolutionStrategy strategy in AllStrategies)
                 if (strategy > value)
                     AllowedStrategies.Remove(strategy);
         }

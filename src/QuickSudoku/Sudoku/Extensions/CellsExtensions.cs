@@ -4,7 +4,7 @@ namespace QuickSudoku.Sudoku.Extensions;
 
 public static class CellsExtensions
 {
-    public struct SolvedCells<T> : IEnumerable<SudokuCell>
+    public readonly struct SolvedCells<T> : IEnumerable<SudokuCell>
         where T : struct, IReadOnlyList<SudokuCell>
     {
         public struct Enumerator : IEnumerator<SudokuCell>
@@ -18,9 +18,9 @@ public static class CellsExtensions
                 _index = -1;
             }
 
-            public SudokuCell Current => _cells[_index];
+            public readonly SudokuCell Current => _cells[_index];
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public bool MoveNext()
             {
@@ -33,7 +33,7 @@ public static class CellsExtensions
                 _index = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         readonly T _cells;
@@ -49,7 +49,7 @@ public static class CellsExtensions
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public struct UnsolvedCells<T> : IEnumerable<SudokuCell>
+    public readonly struct UnsolvedCells<T> : IEnumerable<SudokuCell>
         where T : struct, IReadOnlyList<SudokuCell>
     {
         public struct Enumerator : IEnumerator<SudokuCell>
@@ -63,9 +63,9 @@ public static class CellsExtensions
                 _index = -1;
             }
 
-            public SudokuCell Current => _cells[_index];
+            public readonly SudokuCell Current => _cells[_index];
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             public bool MoveNext()
             {
@@ -78,7 +78,7 @@ public static class CellsExtensions
                 _index = -1;
             }
 
-            public void Dispose() { }
+            public readonly void Dispose() { }
         }
 
         readonly T _cells;

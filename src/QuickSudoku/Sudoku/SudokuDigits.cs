@@ -26,7 +26,7 @@ public enum SudokuDigits : ushort
 public static class SudokuDigitsExtensions
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct Enumerable : IEnumerable<int>
+    public readonly struct Enumerable : IEnumerable<int>
     {
         public struct Enumerator : IEnumerator<int>
         {
@@ -36,13 +36,13 @@ public static class SudokuDigitsExtensions
             readonly ushort _value;
             sbyte _current;
 
-            public int Current
+            public readonly int Current
             {
                 get
                 {
                     if (_current < 0)
                     {
-                        if (_current == NotStarted)
+                        if (_current is NotStarted)
                             throw new InvalidOperationException("Enumeration has not started. Call MoveNext.");
 
                         throw new InvalidOperationException("Enumeration already finished.");
@@ -52,7 +52,7 @@ public static class SudokuDigitsExtensions
                 }
             }
 
-            object IEnumerator.Current => Current;
+            readonly object IEnumerator.Current => Current;
 
             internal Enumerator(ushort value)
             {
@@ -62,12 +62,12 @@ public static class SudokuDigitsExtensions
 
             public bool MoveNext()
             {
-                if (_current == Finished)
+                if (_current is Finished)
                     throw new InvalidOperationException("Enumeration already finished.");
 
                 for (; ++_current < 9;)
                 {
-                    var flag = _value & (ulong)(1 << _current);
+                    ulong flag = _value & (ulong)(1 << _current);
                     if (flag != 0)
                         return true;
                 }
@@ -79,7 +79,7 @@ public static class SudokuDigitsExtensions
             public void Reset()
                 => _current = NotStarted;
 
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
         }
 
         readonly SudokuDigits _digits;

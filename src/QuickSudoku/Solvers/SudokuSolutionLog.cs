@@ -30,7 +30,7 @@ public class SudokuSolutionLog : ISudokuSolutionLog
 
     public void Push(SudokuSolutionStep step, int count = 1)
     {
-        if (!_adoptedStrategies.TryGetValue(step.Strategy, out var previousCount))
+        if (!_adoptedStrategies.TryGetValue(step.Strategy, out int previousCount))
             previousCount = 0;
 
         _adoptedStrategies[step.Strategy] = previousCount + count;

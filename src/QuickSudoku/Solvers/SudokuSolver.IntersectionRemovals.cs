@@ -8,7 +8,7 @@ namespace QuickSudoku.Solvers;
 partial class SudokuSolver
 {
     /// <summary>
-    /// Solve throgh intersection removal in a puzzle.
+    /// Solve through intersection removal in a puzzle.
     ///
     /// This method should be called only after calling another method to remove invalid candidates.
     /// </summary>

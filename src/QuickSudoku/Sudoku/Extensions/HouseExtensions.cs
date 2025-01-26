@@ -5,7 +5,7 @@ public static class HouseExtensions
     /// <inheritdoc cref="QuickSudoku.Extensions.HouseExtensions.IsSolved"/>
     public static bool IsSolved(this SudokuHouse house)
     {
-        foreach (var cell in house.Cells)
+        foreach (SudokuCell cell in house.Cells)
             if (!cell.IsSolved())
                 return false;
 
@@ -15,7 +15,7 @@ public static class HouseExtensions
     /// <inheritdoc cref="QuickSudoku.Extensions.HouseExtensions.HasSolution"/>
     public static bool HasSolution(this SudokuHouse house)
     {
-        foreach (var cell in house.Cells)
+        foreach (SudokuCell cell in house.Cells)
             if (!cell.HasSolution())
                 return false;
 
@@ -25,7 +25,7 @@ public static class HouseExtensions
     /// <inheritdoc cref="QuickSudoku.Extensions.HouseExtensions.Contains"/>
     public static bool Contains(this SudokuHouse house, int value)
     {
-        foreach (var cell in house.Cells)
+        foreach (SudokuCell cell in house.Cells)
             if (cell.Contains(value))
                 return true;
 

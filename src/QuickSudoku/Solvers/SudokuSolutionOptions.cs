@@ -20,7 +20,7 @@ public record class SudokuSolutionOptions
     /// Stop looking for a solution if the puzzle is deemed
     /// to have multiple valid solutions.
     /// </summary>
-    public bool EnsureSingleSolution { get; init; }  // TODO
+    public bool EnsureSingleSolution { get; init; } // TODO
 
     /// <summary>
     /// Stop looking for a solution if the difficulty gets above this threshold.

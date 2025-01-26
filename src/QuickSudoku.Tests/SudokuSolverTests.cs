@@ -13,7 +13,7 @@ public class SudokuSolverTests
     [Fact]
     public void TestNakedSingles()
     {
-        var puzzle = SudokuPuzzle.FromScheme(@"
+        SudokuPuzzle puzzle = SudokuPuzzle.FromScheme(@"
            >... 123 ...
             ..8 ... ...
             .7. ... ...
@@ -27,11 +27,11 @@ public class SudokuSolverTests
             ... ... ...
         ");
 
-        var allocBefore = GC.GetTotalAllocatedBytes(true);
+        long allocBefore = GC.GetTotalAllocatedBytes(true);
 
-        var nakedSinglesCount = SudokuSolver.SolveNakedSingles(puzzle);
+        int nakedSinglesCount = SudokuSolver.SolveNakedSingles(puzzle);
 
-        var allocAfter = GC.GetTotalAllocatedBytes(true);
+        long allocAfter = GC.GetTotalAllocatedBytes(true);
 
         Assert.Equal(1, nakedSinglesCount);
 
@@ -43,7 +43,7 @@ public class SudokuSolverTests
     [Fact]
     public void TestHiddenSingle()
     {
-        var puzzle = SudokuPuzzle.FromScheme(@"
+        SudokuPuzzle puzzle = SudokuPuzzle.FromScheme(@"
            >... ... ...
             ... 1.. ...
             ... ... 1..
@@ -60,11 +60,11 @@ public class SudokuSolverTests
         // remove candidates through other methods before attempting to solve hidden singles
         SudokuSolver.SolveNakedSingles(puzzle);
 
-        var allocBefore = GC.GetTotalAllocatedBytes(true);
+        long allocBefore = GC.GetTotalAllocatedBytes(true);
 
-        var nakedSinglesFound = SudokuSolver.SolveHiddenSingles(puzzle);
+        int nakedSinglesFound = SudokuSolver.SolveHiddenSingles(puzzle);
 
-        var allocAfter = GC.GetTotalAllocatedBytes(true);
+        long allocAfter = GC.GetTotalAllocatedBytes(true);
 
         Assert.Equal(1, nakedSinglesFound);
 
@@ -76,7 +76,7 @@ public class SudokuSolverTests
     [Fact]
     public void TestNakedPair()
     {
-        var puzzle = SudokuPuzzle.FromScheme(@"
+        SudokuPuzzle puzzle = SudokuPuzzle.FromScheme(@"
            >.12 ... ...
            >.34 ... ...
             567 ... ...
@@ -100,11 +100,11 @@ public class SudokuSolverTests
         Assert.True(puzzle[0, 3].CandidateValues.Contains(8));
         Assert.True(puzzle[0, 3].CandidateValues.Contains(9));
 
-        var allocBefore = GC.GetTotalAllocatedBytes(true);
+        long allocBefore = GC.GetTotalAllocatedBytes(true);
 
-        var nakedPairsFound = SudokuSolver.SolveNakedPairs(puzzle);
+        int nakedPairsFound = SudokuSolver.SolveNakedPairs(puzzle);
 
-        var allocAfter = GC.GetTotalAllocatedBytes(true);
+        long allocAfter = GC.GetTotalAllocatedBytes(true);
 
         Assert.Equal(1, nakedPairsFound);
 
@@ -117,7 +117,7 @@ public class SudokuSolverTests
     [Fact]
     public void TestNakedTriple()
     {
-        var puzzle = SudokuPuzzle.FromScheme(@"
+        SudokuPuzzle puzzle = SudokuPuzzle.FromScheme(@"
            >.12 ... ...
            >.34 ... ...
             .56 ... ...
@@ -142,11 +142,11 @@ public class SudokuSolverTests
         Assert.True(puzzle[0, 3].CandidateValues.Contains(8));
         Assert.True(puzzle[0, 3].CandidateValues.Contains(9));
 
-        var allocBefore = GC.GetTotalAllocatedBytes(true);
+        long allocBefore = GC.GetTotalAllocatedBytes(true);
 
-        var nakedPairsFound = SudokuSolver.SolveNakedTriples(puzzle);
+        int nakedPairsFound = SudokuSolver.SolveNakedTriples(puzzle);
 
-        var allocAfter = GC.GetTotalAllocatedBytes(true);
+        long allocAfter = GC.GetTotalAllocatedBytes(true);
 
         Assert.Equal(1, nakedPairsFound);
 
@@ -160,7 +160,7 @@ public class SudokuSolverTests
     //[Fact]
     //public void TestNakedPair()
     //{
-    //    var puzzle = SudokuPuzzle.FromScheme(@"
+    //    SudokuPuzzle puzzle = SudokuPuzzle.FromScheme(@"
     //        123 ... ...
     //        .45 ... ...
     //        .67 ... ...
@@ -184,11 +184,11 @@ public class SudokuSolverTests
     //    Assert.True(puzzle[0, 3].CandidateValues.Contains(8));
     //    Assert.True(puzzle[0, 3].CandidateValues.Contains(9));
     //
-    //    var allocBefore = GC.GetTotalAllocatedBytes(true);
+    //    long allocBefore = GC.GetTotalAllocatedBytes(true);
     //
-    //    var nakedPairsFound = SudokuSolver.SolveNakedPairs(puzzle);
+    //    int nakedPairsFound = SudokuSolver.SolveNakedPairs(puzzle);
     //
-    //    var allocAfter = GC.GetTotalAllocatedBytes(true);
+    //    long allocAfter = GC.GetTotalAllocatedBytes(true);
     //
     //    Assert.Equal(2, nakedPairsFound);
     //
@@ -201,7 +201,7 @@ public class SudokuSolverTests
     //[Fact]
     //public void TestNakedTriple()
     //{
-    //    var puzzle = SudokuPuzzle.FromScheme(@"
+    //    SudokuPuzzle puzzle = SudokuPuzzle.FromScheme(@"
     //        .12 ... ...
     //        .34 ... ...
     //        .56 ... ...
@@ -227,11 +227,11 @@ public class SudokuSolverTests
     //    Assert.True(puzzle[0, 3].CandidateValues.Contains(8));
     //    Assert.True(puzzle[0, 3].CandidateValues.Contains(9));
     //
-    //    var allocBefore = GC.GetTotalAllocatedBytes(true);
+    //    long allocBefore = GC.GetTotalAllocatedBytes(true);
     //
-    //    var nakedTriplesFound = SudokuSolver.SolveNakedTriples(puzzle);
+    //    int nakedTriplesFound = SudokuSolver.SolveNakedTriples(puzzle);
     //
-    //    var allocAfter = GC.GetTotalAllocatedBytes(true);
+    //    long allocAfter = GC.GetTotalAllocatedBytes(true);
     //
     //    Assert.Equal(3, nakedTriplesFound);
     //

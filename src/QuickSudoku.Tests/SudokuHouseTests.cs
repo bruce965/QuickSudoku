@@ -13,7 +13,7 @@ public class SudokuHouseTests
     [Fact]
     public void TestIntersections()
     {
-        var puzzle = new SudokuPuzzle();
+        SudokuPuzzle puzzle = new();
 
         Assert.Equal(((SudokuHouse)puzzle.Rows[0]).IntersectingHouses[0].Second, (SudokuHouse)puzzle.Columns[0]);
         Assert.Equal(((SudokuHouse)puzzle.Rows[0]).IntersectingHouses[1].Second, (SudokuHouse)puzzle.Columns[1]);
