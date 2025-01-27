@@ -216,6 +216,10 @@ public static class SudokuGenerator
                 continue;
             }
 
+            // if above the difficulty threshold, rollback and continue
+            if (finalSolutionLog.Difficulty > solutionOptions.StopAtDifficulty)
+                continue;
+
             // if puzzle is still valid, save and continue
             removingBuffer.CopyTo(puzzle);
 
